@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Clima — Sintesi, tutte le stanze (desktop)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@200..800&amp;family=Martian+Mono:wght@300..500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E1215}
+a{color:#EEF2F4}a:hover{color:#FFB07A}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:'Martian Mono',monospace;letter-spacing:-0.02em}
+.enter{opacity:0;animation:enter .9s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes enter{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.e1{animation-delay:.08s}.e2{animation-delay:.16s}.e3{animation-delay:.24s}
+.drawp{animation:dp 1.2s cubic-bezier(.4,0,.2,1) both}@keyframes dp{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.drawf{opacity:0;animation:df .8s ease 1s forwards}@keyframes df{to{opacity:1}}
+.tstrip{transform-origin:left;animation:tgrow 1s cubic-bezier(.2,.8,.2,1) .2s both}@keyframes tgrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.pulse{position:relative}.pulse::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1.5px solid currentColor;animation:ring 1.8s ease-out infinite}@keyframes ring{from{transform:scale(.6);opacity:.9}to{transform:scale(1.9);opacity:0}}
+.row{transition:background .25s}.row:hover{background:#171D21 !important}
+.open{transition:color .2s, gap .25s}.open:hover{color:#FFB07A !important;gap:10px !important}
+.nav{transition:background .2s}.nav:hover{background:#252D33 !important}
+.hatch{background-image:repeating-linear-gradient(135deg, rgba(255,255,255,.06) 0 6px, transparent 6px 12px)}
+.seg{transition:background .25s,color .25s}.seg:not(.segon):hover{color:#EEF2F4 !important}.segon{background:#EEF2F4 !important;color:#0E1215 !important}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #0E1215; color: #EEF2F4; font-family: 'Albert Sans', system-ui, sans-serif">
+  <div style="max-width: 1400px; margin: 0 auto; padding: 22px 32px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+    <header class="enter" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+      <nav aria-label="Menu principale" style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center">
+        <span style="font-weight: 800; font-size: 17px; margin-right: 14px; letter-spacing: -0.02em">casa</span>
+        <span style="display: flex; align-items: center; gap: 2px; padding: 4px 4px 4px 12px; border-radius: 14px; background: #151A1E">
+          <span style="font-size: 12px; font-weight: 700; letter-spacing: .06em; color: #98A3AB; margin-right: 8px">CLIMA</span>
+          <a href="N-Stanza.dc.html" class="nav" style="padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600; color: #C9D1D6;">Stanza</a>
+          <a href="N-Tutte.dc.html" class="nav" style="padding: 8px 14px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600; background: #EEF2F4; color: #0E1215;">Tutte le stanze</a>
+        </span>
+        <a href="#" class="nav" style="padding: 8px 14px; border-radius: 10px; color: #C9D1D6; text-decoration: none; font-size: 14px">Energia</a>
+        <a href="#" class="nav" style="padding: 8px 14px; border-radius: 10px; color: #C9D1D6; text-decoration: none; font-size: 14px">Luci</a>
+        <a href="#" class="nav" style="padding: 8px 14px; border-radius: 10px; color: #C9D1D6; text-decoration: none; font-size: 14px">+ modulo</a>
+      </nav>
+      <span class="mono num" style="font-size: 13px; color: #98A3AB">ven 20 nov · 08:37 · fuori {{outNow}}</span>
+    </header>
+    
+    
+
+    <section class="enter e2" aria-label="Tutte le stanze" style="background: #151A1E; border-radius: 28px; padding: 22px 22px 16px; display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+        <div style="display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: #C9D1D6">
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 3px; border-radius: 3px; background: #EEF2F4"></span>Misurata</span>
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 3px dotted #EEF2F4"></span>Prevista</span>
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; border-top: 2px dashed #FFB07A"></span>Target</span>
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 16px; height: 10px; background: rgba(255,176,122,.16); border-radius: 2px"></span>Range</span>
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 8px; border-radius: 2px; background: #FF8A4C"></span>Scalda</span>
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 8px; border-radius: 2px; background: repeating-linear-gradient(135deg,#46525B 0 3px,#2A333A 3px 6px)"></span>Standby</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px"><span class="mono num" style="font-size: 12px; color: #C9D1D6">{{hv.when}}</span><div role="group" aria-label="Intervallo" style="display: flex; padding: 3px; background: #1E252A; border-radius: 12px; gap: 2px"><sc-for list="{{ranges}}" as="r" hint-placeholder-count="2"><button type="button" class="seg {{r.cls}}" onClick="{{r.pick}}" style="border: 0; background: transparent; color: #C9D1D6; font: inherit; font-size: 13px; font-weight: 600; padding: 0 14px; height: 38px; border-radius: 10px; cursor: pointer">{{r.label}}</button></sc-for></div></div>
+      </div>
+      <div style="display: flex; gap: 14px">
+        <div style="width: 230px; flex: none; display: flex; flex-direction: column">
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+            <div class="row" style="height: 112px; border-top: 1px solid #1F262B; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 0 8px; border-radius: 10px">
+              <span style="display: flex; align-items: baseline; justify-content: space-between"><span style="font-size: 16px; font-weight: 700">{{r.name}}</span><span class="num" style="font-size: 26px; font-weight: 300">{{r.t}}</span></span>
+              <sc-for list="{{r.st}}" as="x" hint-placeholder-count="1"><span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #C9D1D6"><span class="{{x.anim}}" style="width: 7px; height: 7px; border-radius: {{x.shape}}; background: {{x.dot}}; color: {{x.dot}}; display: inline-block"></span>{{x.t}}</span></sc-for>
+              <a href="N-Stanza.dc.html" class="open" style="font-size: 12px; color: #98A3AB; text-decoration: none; display: inline-flex; gap: 6px">apri la stanza <span aria-hidden="true">→</span></a>
+            </div>
+          </sc-for>
+          <div style="height: 72px; border-top: 1px solid #1F262B; display: flex; flex-direction: column; justify-content: center; padding: 0 8px"><span style="font-size: 16px; font-weight: 700">Esterno</span><span class="num" style="font-size: 12px; color: #C9D1D6">{{outNow}}</span></div>
+        </div>
+        <div onMouseMove="{{hv.move}}" onMouseLeave="{{hv.leave}}" style="position: relative; flex: 1; min-width: 0; cursor: crosshair">
+          <div style="position: absolute; top: 0; bottom: 0; left: {{hv.nowX}}%; right: 0; background: repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 8px, transparent 8px 16px); pointer-events: none"></div>
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+            <div style="height: 112px; border-top: 1px solid #1F262B; display: flex; flex-direction: column; justify-content: center; gap: 4px">
+              <sc-if value="{{r.hasData}}" hint-placeholder-val="{{ true }}">
+                <svg width="100%" height="80" viewBox="0 0 1000 80" preserveAspectRatio="none" aria-hidden="true" style="display: block">
+                  <path d="{{r.band}}" fill="rgba(255,176,122,.16)"></path>
+                  <path d="{{r.tgt}}" fill="none" stroke="#FFB07A" stroke-width="1.4" stroke-dasharray="5 4" vector-effect="non-scaling-stroke"></path>
+                  <path class="drawp" d="{{r.past}}" fill="none" stroke="#EEF2F4" stroke-width="2.2" vector-effect="non-scaling-stroke"></path>
+                  <path class="drawf" d="{{r.fut}}" fill="none" stroke="#EEF2F4" stroke-width="2.2" stroke-dasharray="1 5" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>
+                </svg>
+              </sc-if>
+              <sc-if value="{{r.nodata}}" hint-placeholder-val="{{ false }}"><div class="hatch" style="height: 80px; border-radius: 8px; display: flex; align-items: center; padding-left: 14px; font-size: 13px; color: #98A3AB">Nessun sensore di temperatura · i caloriferi si accendono con quelli del bagno</div></sc-if>
+              <sc-for list="{{r.strips}}" as="sp" hint-placeholder-count="1"><div style="position: relative; height: 7px; border-radius: 4px; background: #1A2025; overflow: hidden"><sc-for list="{{sp.segs}}" as="a" hint-placeholder-count="4"><span class="tstrip" style="position: absolute; top: 0; bottom: 0; left: {{a.l}}%; width: {{a.w}}%; background: {{a.bg}}; opacity: {{a.op}}"></span></sc-for></div></sc-for>
+            </div>
+          </sc-for>
+          <div style="height: 72px; border-top: 1px solid #1F262B; display: flex; align-items: center">
+            <svg width="100%" height="60" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true" style="display: block"><path d="{{oHum}}" fill="none" stroke="#7FD8C8" stroke-width="1.2" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></path><path d="{{oTemp}}" fill="none" stroke="#8EA2FF" stroke-width="2.2" vector-effect="non-scaling-stroke"></path></svg>
+          </div>
+          <div style="position: absolute; top: 0; bottom: 0; left: {{hv.nowX}}%; width: 2px; margin-left: -1px; background: #FF8A4C; pointer-events: none"></div>
+          <sc-if value="{{hv.on}}" hint-placeholder-val="{{ false }}"><div style="position: absolute; top: 0; bottom: 0; left: {{hv.x}}%; width: 1px; background: #EEF2F4; pointer-events: none"></div></sc-if>
+        </div>
+        <div style="width: 170px; flex: none; display: flex; flex-direction: column">
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+            <div style="height: 112px; border-top: 1px solid #1F262B; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; gap: 3px; text-align: right">
+              <span class="num" style="font-size: 22px; font-weight: 300">{{r.vt}}</span>
+              <span class="num" style="font-size: 11px; color: #98A3AB">{{r.vtg}}</span>
+              <sc-for list="{{r.vst}}" as="x" hint-placeholder-count="1"><span style="font-size: 11px; font-weight: 600; color: {{x.dot}}">{{x.t}}</span></sc-for>
+            </div>
+          </sc-for>
+          <div style="height: 72px; border-top: 1px solid #1F262B; display: flex; align-items: center; justify-content: flex-end"><span class="num" style="font-size: 14px; color: #8EA2FF">{{hv.out}}</span></div>
+        </div>
+      </div>
+      <div class="mono num" style="position: relative; height: 14px; margin: 0 184px 0 244px; font-size: 10px"><sc-for list="{{xl}}" as="x" hint-placeholder-count="7"><span style="position: absolute; left: {{x.l}}%; transform: translateX(-50%); white-space: nowrap; color: {{x.c}}">{{x.t}}</span></sc-for></div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+function rng(seed){var s=seed;return function(){s=(s*16807)%2147483647;return (s-1)/2147483646;};}
+function pad(n){return (n<10?'0':'')+n;}
+function it(v){return v.toFixed(1).replace('.',',');}
+function hx(c){return [1,3,5].map(function(i){return parseInt(c.slice(i,i+2),16);});}
+function mix(a,b,t){t=Math.max(0,Math.min(1,t));var pa=hx(a),pb=hx(b);return 'rgb('+pa.map(function(v,i){return Math.round(v+(pb[i]-v)*t);}).join(',')+')';}
+var NS,NOWI,PAST,FUT,START,OUTM,RANGE;
+function hAt(i){return (((START+i*0.5)%24)+24)%24;}
+function dAt(i){return Math.floor((START+i*0.5)/24);}
+function fh(h){h=(h+24)%24;var m=Math.round((h%1)*60);return pad(Math.floor(h))+':'+pad(m);}
+function setRange(r){if(r===RANGE)return;RANGE=r;if(r==='7g'){PAST=336;FUT=24;}else if(r==='split'){PAST=24;FUT=24;}else{PAST=48;FUT=4;}NS=PAST+FUT;NOWI=PAST;START=8.5-PAST*0.5;
+  var g=rng(77),T=[],H=[];for(var i=0;i<NS;i++){var h=hAt(i),d=dAt(i);var t=6.5+(d<0?-d*0.3:0)+4.4*Math.sin((h-9)/24*2*Math.PI)+(i<NOWI?(g()-0.5)*0.6:0);T.push(t);H.push(Math.min(97,90-(t-3)*2.3+(i<NOWI?(g()-0.5)*4:0)));}OUTM={T:T,H:H};}
+var ROOMS=[
+  {name:'Soggiorno',src:'caloriferi + climatizzatore',rad:[[0,18.5],[6,21],[23,18.5]],ac:[[6,8.75,21.5],[16,22,21.5]],hum:47,seed:3,loss:0.032,acKey:'s',kw:0.8},
+  {name:'Corridoio',src:'solo climatizzatore',ac:[[6,9,20.5],[16,23,20.5]],hum:49,seed:5,loss:0.03,acKey:'c',kw:0.5},
+  {name:'Camera',src:'solo caloriferi',rad:[[0,17.5],[6,20],[8,18],[21,19.5],[23,17.5]],hum:51,seed:13,loss:0.028},
+  {name:'Cameretta',src:'solo caloriferi',rad:[[0,18.5],[6,20.5],[8.5,19],[19,20],[23,18.5]],hum:50,seed:17,loss:0.028},
+  {name:'Bagno',src:'caloriferi, insieme al ripostiglio',rad:[[0,19],[6,23],[9,20],[18,23],[22,19]],hum:60,seed:19,loss:0.036,bath:true}
+];
+function entryRad(list,h){var k=list.length-1;for(var i=0;i<list.length;i++)if(h>=list[i][0])k=i;return k;}
+function entryAc(list,h){for(var i=0;i<list.length;i++)if(h>=list[i][0]&&h<list[i][1])return i;return -1;}
+function sim(ri,st){var r=ROOMS[ri],g=rng(r.seed*13+1),T=null,rh=false,ah=false,o={T:[],H:[],rt:[],re:[],ra:[],as:[],ae:[],aa:[]},mode=r.acKey?st.ac[r.acKey]:null,ed=st.edits||{};
+  for(var k=-96;k<NS;k++){var i=Math.max(0,k),h=hAt(k),fut=k>=NOWI,to=OUTM.T[i];
+    var re=r.rad?entryRad(r.rad,h):-1,rt=r.rad?r.rad[re][1]:null,ae=r.ac?entryAc(r.ac,h):-1,as=(r.ac&&ae>=0&&mode!=='Spento')?r.ac[ae][2]:null;
+    if(fut){var d1=ed[ri+':rad:'+re],d2=ed[ri+':ac:'+ae];if(rt!=null&&d1)rt+=d1;if(as!=null&&d2)as+=d2;}
+    if(T==null)T=(rt||as||20);
+    if(rt!=null){if(T<rt-0.3)rh=true;else if(T>rt+0.2)rh=false;}else rh=false;
+    var a='off';if(as!=null){if(mode==='Freddo')a=T>as+0.3?'cool':'idle';else if(mode==='Deumid')a='dry';else{if(T<as-0.3)ah=true;else if(T>as+0.2)ah=false;a=ah?'heat':'idle';}}else ah=false;
+    T+=(rh?0.42:0)+(a==='heat'?0.38:0)-(a==='cool'?0.35:0)+(fut?0:(g()-0.5)*0.05)-(T-(to*0.35+12))*r.loss;
+    var hu=r.hum+2*Math.sin((h-4)/24*2*Math.PI)+(fut?0:(g()-0.5)*1.5);if(r.bath){if(h>=7.5&&h<8.5)hu+=14-(h-7.5)*6;if(h>=20&&h<21)hu+=10-(h-20)*6;}if(a==='heat')hu-=1.5;if(a==='dry')hu-=5;
+    if(k>=0){o.T.push(T);o.H.push(hu);o.rt.push(rt);o.re.push(re);o.ra.push(rt==null?null:(rh?'heat':'idle'));o.as.push(as);o.ae.push(ae);o.aa.push(r.ac?a:null);}}
+  return o;}
+var C={heat:'#FF8A4C',cool:'#4FB3FF',dry:'#59D3B4',idle:'repeating-linear-gradient(135deg,#46525B 0 3px,#2A333A 3px 6px)',muted:'#98A3AB',tLo:'#3A5A8C',tHi:'#C2622E',ac:'#2E4A66'};
+function actTxt(s){return s==='heat'?'scalda':s==='cool'?'raffredda':s==='idle'?'standby':s==='dry'?'deumidifica':'spento';}
+function actBg(s){return s==='heat'?C.heat:s==='cool'?C.cool:s==='idle'?C.idle:s==='dry'?C.dry:'transparent';}
+function actCol(s){return s==='heat'?C.heat:s==='cool'?C.cool:s==='dry'?C.dry:C.muted;}
+function runs(n,key){var out=[],cur=null,s0=0;for(var i=0;i<=n;i++){var v=i<n?key(i):'__end';if(v!==cur){if(cur!==null)out.push({v:cur,s:s0,e:i});cur=v;s0=i;}}return out;}
+function X(i){return ((i+0.5)/NS*1000).toFixed(1);}
+var ICON={home:'M3 11l9-7 9 7v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z',all:'M4 5h16M4 10h16M4 15h16M4 20h16',bolt:'M13 2 4 14h7l-1 8 9-12h-7z',grid:'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z'};
+var DNAME=['dom','lun','mar','mer','gio','ven','sab'];
+function dayLabel(d){var dt=new Date(2026,10,20+d);return DNAME[dt.getDay()]+' '+dt.getDate();}
+class Component extends DCLogic {
+  constructor(p){super(p);this.state={hi:null,range:'24h',edits:{},scene:null,ac:{s:'Caldo',c:'Caldo'},tab:1};}
+  renderVals(){
+    setRange(this.state.range||'24h');var self=this,st=this.state,sims=ROOMS.map(function(r,i){return sim(i,st);});
+    var hi=st.hi,idx=hi!=null?hi:NOWI;
+    function Y(v){return 76-(v-15)/9*72;}
+    function rowPaths(s,arrT){var p='',f='';for(var i=0;i<NS;i++){var y=Y(s.T[i]).toFixed(1);if(i<=NOWI)p+=(i?'L':'M')+X(i)+' '+y;if(i>=NOWI)f+=(i===NOWI?'M':'L')+X(i)+' '+y;}
+      var tg='',open=false,band='',seg=[];for(var q=0;q<=NS;q++){var v=q<NS?arrT[q]:null;if(v!=null){var yy=Y(v).toFixed(1);tg+=(open?'L':'M')+(q/NS*1000).toFixed(1)+' '+yy+'L'+((q+1)/NS*1000).toFixed(1)+' '+yy;open=true;seg.push(q);}else open=false;
+        if((v==null||q===NS)&&seg.length){var t1='',b1='';seg.forEach(function(k,ii){t1+=(ii?'L':'M')+(k/NS*1000).toFixed(1)+' '+Y(arrT[k]+0.2).toFixed(1)+'L'+((k+1)/NS*1000).toFixed(1)+' '+Y(arrT[k]+0.2).toFixed(1);});for(var z=seg.length-1;z>=0;z--){var k2=seg[z];b1+='L'+((k2+1)/NS*1000).toFixed(1)+' '+Y(arrT[k2]-0.3).toFixed(1)+'L'+(k2/NS*1000).toFixed(1)+' '+Y(arrT[k2]-0.3).toFixed(1);}band+=t1+b1+'Z';seg=[];}}
+      return {past:p,fut:f,tgt:tg,band:band};}
+    function strip(arr,kind){return {n:kind==='rad'?'caloriferi':'clima',segs:runs(NS,function(i){return arr[i]+(i<NOWI?'p':'f');}).map(function(q){return {l:(q.s/NS*100).toFixed(3),w:((q.e-q.s)/NS*100).toFixed(3),bg:actBg(arr[q.s]),op:q.s>=NOWI?0.5:1};})};}
+    function status(r,s,i){var out=[];if(r.rad){var a=s.ra[i];out.push({t:'caloriferi '+actTxt(a),dot:a==='heat'?C.heat:'#6A767F',shape:'2px',anim:a==='heat'?'pulse':''});}if(r.ac){var b=s.aa[i];out.push({t:'clima '+actTxt(b),dot:b==='heat'?C.heat:b==='cool'?C.cool:'#6A767F',shape:'50%',anim:(b==='heat'||b==='cool')?'pulse':''});}return out;}
+    var rows=ROOMS.map(function(r,i){var s=sims[i],tg=[];for(var j=0;j<NS;j++)tg.push(s.rt[j]!=null?s.rt[j]:s.as[j]);var P=rowPaths(s,tg),strips=[];if(r.rad)strips.push(strip(s.ra,'rad'));if(r.ac)strips.push(strip(s.aa,'ac'));
+      var tv=tg[idx];return {name:r.name,src:r.src,t:it(s.T[NOWI])+'°',st:status(r,s,NOWI),past:P.past,fut:P.fut,tgt:P.tgt,band:P.band,strips:strips,vt:it(s.T[idx])+'°',vtg:tv!=null?'target '+it(tv)+'°':'nessun target',vst:status(r,s,idx),nodata:false,hasData:true};});
+    var bs=sims[4];rows.push({name:'Ripostiglio',src:'caloriferi del bagno',t:'—',st:[{t:'caloriferi '+actTxt(bs.ra[NOWI])+' (con bagno)',dot:bs.ra[NOWI]==='heat'?C.heat:'#6A767F',shape:'2px',anim:''}],past:'',fut:'',tgt:'',band:'',strips:[strip(bs.ra,'rad')],vt:'—',vtg:'nessun sensore',vst:[],nodata:true,hasData:false});
+    var ot='',oh='';for(var k=0;k<NS;k++){ot+=(k?'L':'M')+X(k)+' '+(56-OUTM.T[k]/15*50).toFixed(1);oh+=(k?'L':'M')+X(k)+' '+(58-(OUTM.H[k]-50)/50*54).toFixed(1);}
+    var heating=[],ranged=[],sum=0;ROOMS.forEach(function(r,i){var s=sims[i],src=[];if(r.rad&&s.ra[NOWI]==='heat')src.push('caloriferi');if(r.ac&&s.aa[NOWI]==='heat')src.push('clima');sum+=s.T[NOWI];if(src.length)heating.push(r.name+' ('+src.join(' + ')+')');else ranged.push(r.name);});
+    var lead='In casa ci sono in media '+it(sum/5)+'°.',rest=(heating.length?'Stanno scaldando '+heating.join(', ')+'. ':'Nessun impianto sta scaldando. ')+(ranged.length?'Nel range: '+ranged.join(', ')+'.':'')+' Fuori '+it(OUTM.T[NOWI])+'°, previsti '+it(Math.max.apply(null,OUTM.T.slice(NOWI)))+'° nel pomeriggio.';
+    var hv={on:hi!=null,x:hi!=null?((hi+0.5)/NS*100).toFixed(2):0,when:(idx<NOWI?(RANGE==='7g'?dayLabel(dAt(idx))+' · ':'ore '):idx===NOWI?'adesso · ':'previsione · ')+fh(hAt(idx)),out:it(OUTM.T[idx])+'° · '+Math.round(OUTM.H[idx])+'%',
+      move:function(e){var r=e.currentTarget.getBoundingClientRect();var k=Math.max(0,Math.min(NS-1,Math.floor((e.clientX-r.left)/r.width*NS)));if(k!==self.state.hi)self.setState({hi:k});},leave:function(){self.setState({hi:null});}};
+    var is7=RANGE==='7g',nowX=((NOWI+0.5)/NS*100).toFixed(2),xl=[{t:'adesso',l:nowX,c:'#FF8A4C'}];
+    for(var k3=0;k3<NS;k3++){var hh=hAt(k3),pos=(k3+0.5)/NS*100;if(Math.abs(pos-nowX)<5)continue;if(is7){if(hh===0)xl.push({t:dayLabel(dAt(k3)),l:(k3/NS*100).toFixed(2),c:'#98A3AB'});}else if(hh%4===0)xl.push({t:fh(hh),l:pos.toFixed(2),c:'#98A3AB'});}
+    hv.nowX=nowX;var ranges=[['24h','24 ore'],['7g','7 giorni']].map(function(r){return {label:r[1],cls:self.state.range===r[0]?'segon':'',pick:function(){self.setState({range:r[0],hi:null});}};});
+    var navtabs=[['Casa','home'],['Storico','chart'],['Energia','bolt'],['Moduli','grid']].map(function(tb,i){return {label:tb[0],icon:ICON[tb[1]]||ICON.home,cls:i===0?'navon':'',pick:function(){}};});
+    return {ranges:ranges,rows:rows,lead:lead,rest:rest,hv:hv,xl:xl,oTemp:ot,oHum:oh,navtabs:navtabs,outNow:it(OUTM.T[NOWI])+'° · '+Math.round(OUTM.H[NOWI])+'%'};
+  }
+}
+
+</script>
+</body>
+</html>

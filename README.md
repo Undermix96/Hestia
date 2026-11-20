@@ -1,5 +1,11 @@
 # Hestia
 
+## Design
+
+La specifica di design (dashboard clima, design **N · Sintesi**, desktop) è in
+[`docs/design/`](docs/design/README.md): parti da [`HANDOFF.md`](docs/design/HANDOFF.md),
+poi mockup, screenshot e sorgenti di riferimento.
+
 ## Docker
 
 Build locale dell'immagine:
