@@ -6,6 +6,9 @@ La specifica di design (dashboard clima, design **N · Sintesi**, desktop) è in
 [`docs/design/`](docs/design/README.md): parti da [`HANDOFF.md`](docs/design/HANDOFF.md),
 poi mockup, screenshot e sorgenti di riferimento.
 
+Il piano di implementazione (architettura, adattatori, milestone) è in
+[`docs/implementation-plan.md`](docs/implementation-plan.md).
+
 ## Docker
 
 Build locale dell'immagine:
