@@ -1,6 +1,6 @@
 # Hestia: piano di implementazione
 
-> Stato: **bozza da rivedere** (20 novembre 2026). Specifica di design: [`docs/design/HANDOFF.md`](design/HANDOFF.md).
+> Stato: **bozza in revisione**, decisioni aperte chiuse (20 novembre 2026). Rispetto all'handoff: niente pulsanti di modalità nella scheda «Corrente climatizzatori». Specifica di design: [`docs/design/HANDOFF.md`](design/HANDOFF.md).
 
 ## Contesto
 
@@ -23,6 +23,12 @@ Il progetto è **pubblico**: deve adattarsi a configurazioni di HA molto diverse
 | Lingue | Italiano e inglese. Altre lingue aggiungibili da terzi senza ricompilare. |
 | Test | Automatici in CI: pytest e Vitest, più Playwright. |
 | Ordine dei lavori | Prima la UI su dati simulati, poi il backend reale, poi la procedura di configurazione, gli override e la previsione. |
+| Licenza | MIT. |
+| Lingua | Codice, commenti e documentazione per contributor in inglese; README in inglese e italiano. |
+| Nomi delle immagini | `ghcr.io/undermix96/hestia-backend` e `hestia-frontend`; il vecchio pacchetto `hestia` è deprecato. |
+| Override temporanei | Solo sulla **fascia in corso**. Le fasce future si possono modificare solo in modo permanente (se l'adattatore lo supporta). |
+| Modalità climatizzatori | **Nessun pulsante di modalità** (Caldo/Freddo/Deumidifica/Spento) nella UI: la modalità la decide il sistema domotico. Hestia la legge e la mostra. |
+| Banda target nel termogramma | Con più impianti nella stessa stanza, **i caloriferi hanno la precedenza**. |
 
 **Casa dell'autore (adattatori v1)**
 - Caloriferi: un'entità `climate.*` per zona.
@@ -72,7 +78,7 @@ Il progetto è **pubblico**: deve adattarsi a configurazioni di HA molto diverse
    - Le fasce sono in ora locale (`zoneinfo`). Il fuso viene da HA o dalla configurazione; il predefinito è Europe/Rome.
    - La griglia a 30 minuti la calcola il server. Il frontend non ricava mai l'ora dall'indice del campione, come fa invece `hAt()` del mockup.
 6. **Nessun testo visibile scritto nel codice.** Anche gli adattatori portano le proprie chiavi di traduzione.
-7. **Progetto pubblico:** licenza e lingua di codice e documentazione sono ancora da decidere (§10, R18).
+7. **Progetto pubblico:** licenza MIT; codice e documentazione per contributor in inglese, README in inglese e italiano.
 
 ## 1. Modello di dominio generico
 
@@ -104,7 +110,7 @@ Capabilities: program {read, representation, writeLevelValues, writeSlotValue, w
 - Il ripostiglio è una Room senza sensore che segue il bagno (`followsRoomId`).
 - Il soggiorno ha due System.
 - Stanze e impianti sono in numero libero.
-- `displayTargetSystemId` sceglie quale target disegnare nella fascia di comfort del termogramma. Se manca, decide la priorità per `kind`.
+- `displayTargetSystemId` sceglie quale target disegnare nella fascia di comfort del termogramma. Se manca, decide la priorità per `kind`: **i caloriferi (`radiator`) vengono prima di tutto il resto**.
 - `entryIndex` dell'handoff diventa `slotRef`, un riferimento opaco gestito dall'adattatore.
 
 **Comportamenti nel core** (`core/behavior.py`)
@@ -130,10 +136,7 @@ Servono a ricostruire le azioni quando il driver non le legge e a simulare le az
 | OutdoorSource | `ha_sensor` | `ha_weather` (`weather.get_forecasts`), `open_meteo`, `composite` (fonte attuale e storica separata da quella delle previsioni) |
 | PowerSource | `sensor_power` (W; kWh per integrale) | `sensor_energy` (kWh `total_increasing`), `estimate` (kW nominali per azione), `none` |
 
-**Modalità degli split.** È una strategia interna al driver (`modeStrategy`), perché nessuna scelta va bene per tutti:
-- `climate_direct`;
-- `input_select_preference`: l'automazione dell'utente legge la modalità preferita da un `input_select`;
-- `none`.
+**Modalità degli split.** La UI **non ha pulsanti di modalità**: la modalità (caldo, freddo, deumidifica, spento) la decide il sistema domotico. Hestia la legge dal driver e la usa per le etichette, il riassunto e la previsione. Il driver conserva `writesMode` nelle capacità solo per eventuali usi futuri.
 
 **Modifiche permanenti e temporanee.**
 - Le modifiche permanenti le gestisce sempre il ProgramSource (valori dei livelli, valore della fascia, orari).
@@ -142,7 +145,7 @@ Servono a ricostruire le azioni quando il driver non le legge e a simulare le az
 
   | Opzione | Compare se |
   |---|---|
-  | «solo questa fascia» | `override.scopes` include `slot` |
+  | «solo questa fascia» | `override.scopes` include `slot` e la fascia è **quella in corso** |
   | «permanente: valore» | `writeLevelValues` o `writeSlotValue` |
   | «permanente: orari» | `writeTimes` |
 
@@ -244,7 +247,7 @@ Hestia/
 - Backend con `/api/health` e `/api/version`; frontend minimo servito da nginx.
 - Dockerfile reali per le due immagini.
 - Workflow: test, build delle 2 immagini × 2 architetture, poi tag git e verifica (§7).
-- `docker-compose.yml`, LICENSE, CONTRIBUTING.
+- `docker-compose.yml`, LICENSE (MIT), CONTRIBUTING; README in inglese e italiano.
 - Regole di `import-linter` attive.
 - `.dockerignore`: esclude `docs/`, `node_modules`, `.venv` e `dist`, include `locales/`.
 
@@ -343,7 +346,7 @@ Hestia/
 - Stati: pending → active → expired / reverted / failed.
 - Riconciliazione all'avvio e alla riconnessione con HA.
 - Con scadenza `hestia`, ripristina il valore del programma a fine fascia.
-- Le fasce future restano pending fino al cambio di fascia (R4).
+- Gli override temporanei si applicano solo alla fascia in corso (R4). Sulle fasce future l'editor offre solo le modifiche permanenti supportate.
 
 **`climate_direct`**
 - Al cambio permanente di un livello, se la fascia in corso usa quel livello, aggiorna subito anche il `climate`.
@@ -356,13 +359,13 @@ Hestia/
   - controlla che i blocchi non si sovrappongano;
   - usa il formato `HH:MM:SS`, con `24:00:00` come fine giornata.
 
-**Editor e modalità**
+**Editor**
 - L'editor mostra un'anteprima della differenza prima di confermare.
-- Gli split usano `modeStrategy` `climate_direct`.
+- Fascia in corso: «solo questa fascia» e le opzioni permanenti supportate. Fascia futura: solo le opzioni permanenti. Fascia conclusa: non cliccabile.
 
 **Verifica**
 - Contratti di scrittura e rilettura: gli altri blocchi restano intatti.
-- Sequenza per le fasce future.
+- Un override temporaneo su una fascia futura viene rifiutato (422).
 - Riapplicazione dopo il riavvio di HA.
 - Limiti ±4° e passo 0,5.
 - Un helper YAML restituisce 409 e la UI nasconde le opzioni.
@@ -437,7 +440,7 @@ Hestia/
 | GET | `/systems`, `/systems/{id}` | sostituiscono `/zones` e `/ac-units`: kind, stato, capacità risolte, programma, storico delle azioni |
 | GET/PUT | `/systems/{id}/program` | PUT solo con `writeTimes`/`writeSlotValue`; il body include la versione letta; 409 se il programma è cambiato nel frattempo |
 | PUT | `/systems/{id}/levels/{levelId}` | solo con `writeLevelValues` |
-| PATCH | `/systems/{id}` | `{mode}` o `{targetC}`, secondo il driver |
+| PATCH | `/systems/{id}` | `{targetC}`, se il driver lo supporta (nessun cambio di modalità dalla UI) |
 | POST/DELETE | `/overrides`, `/overrides/{id}` | scope validato sulle capacità; 422 con codice se non supportato |
 | GET | `/outdoor?from&to`, `/grid?from&to` | |
 | GET/POST | `/forecast/rooms/{id}?hours=`, `/forecast/rooms/{id}/preview`, `/forecast/metrics`, `/forecast/refit` | |
@@ -524,17 +527,14 @@ Hestia/
 - **R3. Riavvio di HA.** Lo schedule passa da `unavailable` a on/off, l'automazione rimette il target e cancella l'override.
   - Con scadenza `external`, Hestia riapplica l'override alla riconnessione.
   - Il blueprint ignora le transizioni da `unavailable`.
-- **R4. Override su una fascia futura con scadenza `external`:** c'è una gara con l'automazione.
-  - Si attende il cambio di target fatto dall'automazione (o un timeout), poi si scrive.
-  - In alternativa, `futureSlots: false`.
-  - **Da decidere.**
+- **R4. Override su una fascia futura:** ci sarebbe una gara con l'automazione dell'utente. **Deciso:** gli override temporanei valgono solo per la fascia in corso (`futureSlots: false` in v1).
 - **R5. Esplosione delle combinazioni di capacità.**
   - Matrice di test dell'editor e scenari mock.
   - L'intersezione delle capacità si calcola in un solo punto (`core/capabilities.py`).
 - **R6. I plugin da cartella eseguono codice arbitrario.** Vanno attivati esplicitamente; la via consigliata è l'entry point. Semver sull'API degli adattatori, con controllo di `api_version`.
 - **R7. Migrazioni della configurazione degli adattatori.** Si usano `configVersion` e funzioni di migrazione, con backup automatico.
 - **R8. Copertura del JSON Schema.** Si supporta un sottoinsieme documentato; un test fallisce se un adattatore usa costrutti non supportati.
-- **R9. Modalità degli split fuori fascia** e significato di «Spento» rispetto al programma: dipende da `modeStrategy`. Per la casa dell'autore va deciso se aggiungere un `input_select` di preferenza.
+- **R9. Modalità degli split.** **Deciso:** nessun pulsante di modalità nella UI; Hestia legge la modalità dal sistema domotico e non la scrive.
 - **R10. Naming in InfluxDB.** L'integrazione HA usa:
   - come measurement, l'unità di misura (`°C`, `%`, `W`);
   - come tag, `entity_id` senza dominio;
@@ -557,11 +557,7 @@ Hestia/
 - **R15. SSE dietro altri proxy** (Traefik, Nginx Proxy Manager): documentare la configurazione.
 - **R16. Build arm64 sotto QEMU:** mitigazioni in §7.
 - **R17. Versione minima di HA** (`schedule.get_schedule`, `weather.get_forecasts`, `data` nei blocchi): fissarla in M2. Ogni adattatore dichiara la propria in `resolve_capabilities()`.
-- **R18. Decisioni ancora aperte:**
-  - licenza (proposta Apache-2.0 o MIT);
-  - lingua di codice e documentazione (proposta: codice e documentazione per contributor in inglese, README in EN e IT);
-  - nomi delle immagini (proposta `hestia-backend` / `hestia-frontend`);
-  - priorità dei kind per la fascia di comfort mostrata nel termogramma.
+- **R18. Decisioni di progetto:** tutte prese (licenza MIT, lingua, nomi delle immagini, precedenza dei caloriferi): vedi «Decisioni prese».
 
 ## File di riferimento
 
