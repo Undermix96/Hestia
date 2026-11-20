@@ -82,10 +82,9 @@ Each run:
 5. creates and pushes the git tag `vX.Y.Z`, only after both builds succeeded;
 6. checks that both images can be pulled anonymously for both architectures.
 
-> **First publish:** GHCR may create new packages as private, and then the last
-> step fails with a link. Make **both** packages public once, from
-> *Packages → hestia-backend* and *Packages → hestia-frontend → Package settings →
-> Change visibility → Public*. Later runs keep the visibility.
+> **Visibility:** the packages are linked to this public repository and inherit its
+> visibility, so they are public from the first publish. If a package ever ends up
+> private (e.g. in a fork), the last step fails with a link to change it.
 
 ## Development
 

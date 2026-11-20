@@ -85,11 +85,10 @@ Ogni esecuzione:
 5. crea e pubblica il tag git `vX.Y.Z`, solo dopo che entrambe le build sono riuscite;
 6. verifica che entrambe le immagini si scarichino senza login per le due architetture.
 
-> **Prima pubblicazione:** GHCR può creare i nuovi pacchetti come privati, e in
-> quel caso l'ultimo step fallisce indicando il link. Rendi pubblici **entrambi** i
-> pacchetti una sola volta, da *Packages → hestia-backend* e
-> *Packages → hestia-frontend → Package settings → Change visibility → Public*.
-> Le esecuzioni successive mantengono la visibilità.
+> **Visibilità:** i pacchetti sono collegati a questo repository pubblico e ne
+> ereditano la visibilità, quindi sono pubblici fin dalla prima pubblicazione. Se un
+> pacchetto risultasse privato (per esempio in un fork), l'ultimo step fallisce
+> indicando il link per cambiarla.
 
 ## Sviluppo
 

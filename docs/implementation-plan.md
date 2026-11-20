@@ -475,7 +475,7 @@ Hestia/
 **Ottimizzazioni e note**
 - Frontend: lo stage Node usa `--platform=$BUILDPLATFORM`, perché l'output statico è uguale per tutte le architetture.
 - Backend: `python:3.12-slim` con uv e wheel di numpy per arm64, senza scipy.
-- Alla prima release vanno resi pubblici entrambi i pacchetti.
+- I pacchetti ereditano la visibilità (pubblica) del repository: nessun passo manuale alla prima release.
 - Il vecchio pacchetto `hestia` va segnato come deprecato.
 
 ## 8. docker-compose e nginx
