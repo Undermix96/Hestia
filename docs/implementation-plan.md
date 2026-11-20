@@ -254,7 +254,7 @@ Hestia/
 **Verifica**
 - `docker buildx imagetools inspect` mostra manifest amd64 e arm64 per entrambe le immagini.
 - Il pull anonimo funziona per entrambi i pacchetti.
-- `compose up` su arm64 risponde su `/api/health` passando da nginx.
+- `compose up` risponde su `/api/health` passando da nginx. L'arm64 si verifica solo tramite build e manifest (nessuna macchina arm64 per i test).
 
 ### M1: UI fedele ai mockup, guidata dalle capacità, su dati simulati (v0.2.0)
 
