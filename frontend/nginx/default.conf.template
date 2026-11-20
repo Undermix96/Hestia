@@ -1,0 +1,81 @@
+# Hestia frontend: static SPA + reverse proxy to the backend.
+#
+# Rendered at container start by the nginx image entrypoint (envsubst), which
+# only substitutes variables defined in the environment:
+#   ${BACKEND_URL}          backend base URL, e.g. http://backend:8000 (no trailing slash)
+#   ${NGINX_LOCAL_RESOLVERS} DNS servers from /etc/resolv.conf
+#                           (filled in because NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1)
+# nginx's own variables ($uri, $host, ...) are left untouched.
+
+# The backend address is resolved at request time, not at startup: nginx starts
+# even if the backend is not up yet and follows its IP when the container is
+# recreated. The resolver does not read /etc/hosts, so BACKEND_URL must use a
+# DNS name or an IP address.
+resolver ${NGINX_LOCAL_RESOLVERS} valid=10s ipv6=off;
+
+server {
+    # IPv4 only: an IPv6 listener fails to start where IPv6 is disabled in the container.
+    listen 8080;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    server_tokens off;
+    charset utf-8;
+
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/css application/javascript application/json image/svg+xml text/plain;
+
+    set $backend "${BACKEND_URL}";
+
+    # Hashed build output: safe to cache forever.
+    location /assets/ {
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        try_files $uri =404;
+    }
+
+    # Live updates (Server-Sent Events): no buffering, long-lived connection.
+    location /api/live {
+        proxy_pass $backend;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        # nginx is the only trusted hop: drop any client-supplied X-Forwarded-For,
+        # otherwise a browser could choose the client IP the backend sees.
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 1h;
+        proxy_send_timeout 1h;
+    }
+
+    location /api/ {
+        proxy_pass $backend;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        # nginx is the only trusted hop: drop any client-supplied X-Forwarded-For,
+        # otherwise a browser could choose the client IP the backend sees.
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # The SPA shell must always be revalidated so new releases are picked up.
+    location = /index.html {
+        add_header Cache-Control "no-cache" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "same-origin" always;
+    }
+
+    # SPA fallback: unknown paths are handled by the client-side router.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

@@ -1,0 +1,100 @@
+[project]
+name = "hestia"
+version = "0.0.0"
+description = "Hestia backend: Home Assistant dashboard API."
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.32",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28",
+    "import-linter>=2.1",
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "ruff>=0.8",
+]
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["hestia"]
+
+# --- Ruff -------------------------------------------------------------------
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort
+    "B",     # bugbear
+    "UP",    # pyupgrade
+    "N",     # pep8-naming
+    "SIM",   # simplify
+    "RUF",   # ruff-specific
+    "ASYNC", # async pitfalls
+]
+
+# --- mypy -------------------------------------------------------------------
+
+[tool.mypy]
+python_version = "3.12"
+files = ["hestia", "tests"]
+strict = true
+plugins = ["pydantic.mypy"]
+
+# --- pytest -----------------------------------------------------------------
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+filterwarnings = [
+    "error",
+    # Starlette's TestClient still works on httpx; drop once the test client migrates.
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated",
+]
+
+# --- import-linter ----------------------------------------------------------
+# The core must stay pure (no I/O, no frameworks); ports may only depend on the core.
+
+[tool.importlinter]
+root_packages = ["hestia"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Core is pure: no adapters, app, api or I/O libraries"
+type = "forbidden"
+source_modules = ["hestia.core"]
+forbidden_modules = [
+    "hestia.adapters",
+    "hestia.app",
+    "hestia.api",
+    "fastapi",
+    "starlette",
+    "httpx",
+    "pydantic_settings",
+    "influxdb_client",
+    "websockets",
+    "sqlite3",
+    "aiohttp",
+]
+
+[[tool.importlinter.contracts]]
+name = "Ports depend only on the core"
+type = "forbidden"
+source_modules = ["hestia.ports"]
+forbidden_modules = [
+    "hestia.adapters",
+    "hestia.app",
+    "hestia.api",
+]
