@@ -254,7 +254,7 @@ Hestia/
 **Verifica**
 - `docker buildx imagetools inspect` mostra manifest amd64 e arm64 per entrambe le immagini.
 - Il pull anonimo funziona per entrambi i pacchetti.
-- `compose up` su arm64 risponde su `/api/health` passando da nginx.
+- `compose up` risponde su `/api/health` passando da nginx. L'arm64 si verifica solo tramite build e manifest (nessuna macchina arm64 per i test).
 
 ### M1: UI fedele ai mockup, guidata dalle capacità, su dati simulati (v0.2.0)
 
@@ -475,7 +475,7 @@ Hestia/
 **Ottimizzazioni e note**
 - Frontend: lo stage Node usa `--platform=$BUILDPLATFORM`, perché l'output statico è uguale per tutte le architetture.
 - Backend: `python:3.12-slim` con uv e wheel di numpy per arm64, senza scipy.
-- Alla prima release vanno resi pubblici entrambi i pacchetti.
+- I pacchetti ereditano la visibilità (pubblica) del repository: nessun passo manuale alla prima release.
 - Il vecchio pacchetto `hestia` va segnato come deprecato.
 
 ## 8. docker-compose e nginx

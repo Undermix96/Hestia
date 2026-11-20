@@ -1,0 +1,50 @@
+# Hestia - production deployment.
+#
+# Uses only the public images on GHCR (no build section): images are built by
+# the GitHub Actions workflow. Usage:
+#
+#   cp .env.example .env      # optional, edit as needed
+#   docker compose up -d
+#
+# Then open http://<host>:8080 (or the port set in HESTIA_PORT).
+#
+# HESTIA_TAG only selects the image tag. It is deliberately not named
+# HESTIA_VERSION: .env is also passed to the backend (env_file), and the
+# backend reports HESTIA_VERSION, which the image sets to its own version.
+
+name: hestia
+
+services:
+  backend:
+    image: ghcr.io/undermix96/hestia-backend:${HESTIA_TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - hestia-data:/data
+    # No published ports: the backend is reachable only through the frontend.
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3).status == 200 else 1)"
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+  frontend:
+    image: ghcr.io/undermix96/hestia-frontend:${HESTIA_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:8000
+    ports:
+      - "${HESTIA_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  hestia-data:

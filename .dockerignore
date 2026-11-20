@@ -1,9 +1,42 @@
+# Build context for both images is the repository root.
+# Keep it small, but never exclude backend/, frontend/, contract/ or locales/.
+
+# VCS and CI
 .git
+.gitattributes
 .github
-.gitignore
-.dockerignore
+
+# Documentation and examples (not needed by any image)
+docs/
+examples/
+
+# Local environment and secrets
 .env
 .env.*
-*.log
-README.md
-docs/
+!.env.example
+
+# Dependencies and build output
+**/node_modules
+**/.venv
+**/dist
+**/build
+
+# Tests, caches and reports
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/.import_linter_cache
+**/coverage
+**/htmlcov
+**/.coverage
+**/playwright-report
+**/test-results
+**/blob-report
+
+# Editors and OS files
+**/.vscode
+**/.idea
+**/.DS_Store
+**/Thumbs.db

@@ -1,0 +1,93 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Hestia API",
+    "license": {
+      "name": "MIT",
+      "identifier": "MIT"
+    },
+    "version": "1"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Get Health",
+        "description": "Liveness probe used by Docker and the frontend proxy.",
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/version": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Get Version",
+        "description": "Application version and API contract version.",
+        "operationId": "getVersion",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "HealthResponse"
+      },
+      "VersionResponse": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "apiVersion": {
+            "type": "integer",
+            "title": "Apiversion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "apiVersion"
+        ],
+        "title": "VersionResponse"
+      }
+    }
+  }
+}

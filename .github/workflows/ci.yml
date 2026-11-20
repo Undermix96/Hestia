@@ -1,0 +1,21 @@
+name: CI
+
+# Runs the full test suite on every push and pull request.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+# A newer run on the same ref makes older ones pointless: cancel them.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests
+    permissions:
+      contents: read
+    uses: ./.github/workflows/tests.yml

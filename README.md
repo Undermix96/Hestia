@@ -1,55 +1,114 @@
 # Hestia
 
-## Design
+[Italiano](README.it.md) · **English**
 
-La specifica di design (dashboard clima, design **N · Sintesi**, desktop) è in
-[`docs/design/`](docs/design/README.md): parti da [`HANDOFF.md`](docs/design/HANDOFF.md),
-poi mockup, screenshot e sorgenti di riferimento.
+Hestia is a web dashboard for [Home Assistant](https://www.home-assistant.io/)
+that runs in Docker on your LAN. Its first module, **Climate**, shows each room's
+temperature, heating and cooling systems, schedules and power usage, with a
+"Room" view and an "All rooms" view. The menu is modular, so more features can
+be added over time.
 
-Il piano di implementazione (architettura, adattatori, milestone) è in
-[`docs/implementation-plan.md`](docs/implementation-plan.md).
+Hestia is designed to adapt to very different Home Assistant setups: everything
+that talks to HA, InfluxDB or weather services is an **adapter** with its own
+configuration schema and declared capabilities, and the UI adapts to what each
+adapter supports. See [docs/architecture.md](docs/architecture.md).
 
-## Docker
+## Status
 
-Build locale dell'immagine:
+**Pre-alpha — milestone M0** (skeleton, CI and license). The images build and run,
+but the dashboard only shows its version for now: there is nothing useful to
+install yet. The roadmap is in
+[docs/implementation-plan.md](docs/implementation-plan.md) §5.
+
+## Quick start
+
+Requirements: Docker with the Compose plugin, on `amd64` or `arm64`.
 
 ```bash
-docker build -t hestia:local .
-docker run --rm hestia:local
+mkdir hestia && cd hestia
+curl -fsSLO https://raw.githubusercontent.com/Undermix96/Hestia/main/docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/Undermix96/Hestia/main/.env.example -o .env  # optional
+docker compose up -d
 ```
 
-Immagine pubblicata (pubblica, nessun login richiesto):
+Then open `http://<host>:8080`.
 
-```bash
-docker pull ghcr.io/undermix96/hestia:latest
-docker pull ghcr.io/undermix96/hestia:v0.0.1
-```
+- The `.env` file is optional; see [`.env.example`](.env.example) for the
+  available variables (`HESTIA_TAG` to pin an image tag, `HESTIA_PORT` to
+  change the published port, and the Home Assistant / InfluxDB settings used by
+  later milestones).
+- Data (configuration, database, extra languages, plugins) is stored in the
+  `hestia-data` volume, mounted at `/data` in the backend.
+- Only the frontend publishes a port; the backend is reached through it at `/api/`.
+- Hestia has no login and is meant for the LAN only. If you expose it, put it
+  behind a reverse proxy with authentication.
 
-## Versioni
+To update: `docker compose pull && docker compose up -d`.
 
-Le versioni seguono il formato `vMAJOR.MINOR.PATCH`, a partire da `v0.0.1`.
-Ogni versione corrisponde a un tag git e a un'immagine su `ghcr.io`.
+## Images and tags
 
-## CI
+| Image | Contents |
+|---|---|
+| `ghcr.io/undermix96/hestia-backend` | Python/FastAPI API on port 8000 (non-root) |
+| `ghcr.io/undermix96/hestia-frontend` | Static UI served by unprivileged nginx on port 8080, proxying `/api/` to the backend (`BACKEND_URL`, default `http://backend:8000`) |
 
-Il workflow [`Docker Build`](.github/workflows/docker-build.yml) si avvia manualmente
-dalla tab **Actions** di GitHub (**Run workflow**), solo dal branch `main`.
+Both images are multi-arch (`linux/amd64`, `linux/arm64`) and public: no login is
+needed to pull them. Each release publishes the tags `vX.Y.Z`, `X.Y.Z`, `X.Y`,
+`sha-<commit>` and `latest`. Always use the same tag for both images.
 
-Input:
+The old single image `ghcr.io/undermix96/hestia` is **deprecated** and no longer updated.
 
-| Input     | Default | Descrizione |
-|-----------|---------|-------------|
-| `bump`    | `patch` | Parte da incrementare rispetto all'ultimo tag (`patch`, `minor`, `major`). Senza tag precedenti si parte da `v0.0.1`. |
-| `version` | vuoto   | Versione esplicita (es. `v0.0.1`); se impostata ignora `bump`. |
+## Versioning and releases
 
-Ogni esecuzione:
+Versions follow `vMAJOR.MINOR.PATCH`; each version is a git tag plus the two images.
 
-1. calcola la versione e si ferma se il tag esiste già;
-2. esegue build e push dell'immagine su `ghcr.io/undermix96/hestia` con i tag
-   `vX.Y.Z`, `X.Y.Z`, `X.Y`, `sha-<commit>` e `latest`;
-3. crea e pubblica il tag git `vX.Y.Z`;
-4. verifica che l'immagine sia scaricabile senza login, e fallisce se il pacchetto non è pubblico.
+Releases are made by the [`Docker Build`](.github/workflows/docker-build.yml)
+workflow, started manually from the GitHub **Actions** tab (**Run workflow**),
+only from `main`.
 
-> **Prima pubblicazione:** se GHCR crea il pacchetto come privato, l'ultimo step fallisce
-> e indica il link. Rendilo pubblico una sola volta da *Packages → hestia → Package settings →
-> Change visibility → Public*: le esecuzioni successive mantengono la visibilità.
+| Input | Default | Description |
+|---|---|---|
+| `bump` | `patch` | Part to increment from the latest tag (`patch`, `minor`, `major`). Without previous tags it starts from `v0.0.1`. |
+| `version` | empty | Explicit version (e.g. `v0.1.0`); when set, `bump` is ignored. |
+
+Each run:
+
+1. computes the version and stops if the tag already exists;
+2. runs the full test suite (the same as [CI](.github/workflows/ci.yml));
+3. builds and pushes both images for `amd64` and `arm64` with the immutable
+   tags (`vX.Y.Z`, `X.Y.Z`, `sha-<commit>`);
+4. moves `X.Y` and `latest` of both images to the new release, only after both
+   builds succeeded, so the shared tags always match across the two images;
+5. creates and pushes the git tag `vX.Y.Z`, only after both builds succeeded;
+6. checks that both images can be pulled anonymously for both architectures.
+
+> **Visibility:** the packages are linked to this public repository and inherit its
+> visibility, so they are public from the first publish. If a package ever ends up
+> private (e.g. in a fork), the last step fails with a link to change it.
+
+## Development
+
+This is a monorepo:
+
+| Path | Contents |
+|---|---|
+| [`backend/`](backend/README.md) | Python 3.12 + FastAPI, managed with uv |
+| [`frontend/`](frontend/README.md) | React + TypeScript + Vite, managed with npm |
+| [`contract/openapi.json`](contract/openapi.json) | API contract generated from the backend |
+| [`locales/`](locales/README.md) | Translations |
+| [`docs/`](docs/) | Architecture, design and implementation plan |
+
+See [backend/README.md](backend/README.md) and [frontend/README.md](frontend/README.md)
+for the commands to install, run, lint and test each part, and
+[CONTRIBUTING.md](CONTRIBUTING.md) for the contribution guidelines.
+
+## Documentation
+
+- [docs/architecture.md](docs/architecture.md): architecture overview (core, ports, adapters).
+- [docs/implementation-plan.md](docs/implementation-plan.md): implementation plan and milestones (in Italian).
+- [docs/design/](docs/design/README.md): design specification of the Climate
+  dashboard; start from [HANDOFF.md](docs/design/HANDOFF.md).
+
+## License
+
+[MIT](LICENSE) © 2026 Undermix96

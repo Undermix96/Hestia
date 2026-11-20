@@ -22,3 +22,27 @@ logs/
 dist/
 build/
 out/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+
+# Node
+node_modules/
+.vite/
+*.tsbuildinfo
+
+# Test reports
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+coverage/
