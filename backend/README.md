@@ -47,7 +47,23 @@ uv run python -m hestia.export_openapi
 ```
 
 CI fails when the committed file is out of date. API payloads use camelCase on the wire
-(`hestia.api.schemas.ApiModel`) and snake_case in Python.
+(`hestia.api.schemas.ApiModel`) and snake_case in Python. After regenerating the contract, also
+regenerate the frontend types (`npm run gen:api` from `frontend/`).
+
+Where the contract models live:
+
+| Module | Contents |
+|---|---|
+| `hestia/core/base.py` | `DomainModel`: camelCase aliases, frozen; every property is listed as required in the JSON schema (nullable fields are sent as `null`, never omitted). |
+| `hestia/core/{literals,program,capabilities,overrides}.py` | Domain values on the wire: programs (`Program`, `Slot`, `Level`), adapter capabilities, overrides. |
+| `hestia/core/domain.py` | Configuration entities (`Room`, `System`, `AdapterRef`): internal, not exported in M1. |
+| `hestia/api/schemas.py` | `ApiModel` (subclass of `DomainModel`) and the `ApiError` body (`code`, `message`). |
+| `hestia/api/clima_models.py` | UI aggregates of the clima module (`RoomTimeline`, `ClimaOverview`, ...). |
+
+The clima and override endpoints (`GET /api/rooms`, `GET /api/clima/rooms/{room_id}/timeline`,
+`GET /api/clima/overview`, `POST /api/overrides`, `DELETE /api/overrides/{override_id}`) have their
+final signatures but no data source yet: until M2 they answer **503** with
+`{"code": "no_data_source", "message": ...}`. The M1 UI uses its own mock data source.
 
 ## Configuration
 

@@ -1,8 +1,0 @@
-{
-  "app.title": "Hestia",
-  "app.tagline": "Dashboard del clima di casa",
-  "status.label": "Stato del server",
-  "status.loading": "Connessione al server…",
-  "status.ok": "Server raggiungibile, versione {version}",
-  "status.error": "Server non raggiungibile"
-}

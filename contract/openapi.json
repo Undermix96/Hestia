@@ -52,10 +52,433 @@
           }
         }
       }
+    },
+    "/api/rooms": {
+      "get": {
+        "tags": [
+          "clima"
+        ],
+        "summary": "Get Rooms",
+        "description": "Every room in configuration order.",
+        "operationId": "getRooms",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RoomView"
+                  },
+                  "type": "array",
+                  "title": "Response Getrooms"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "No data source until M2.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clima/rooms/{room_id}/timeline": {
+      "get": {
+        "tags": [
+          "clima"
+        ],
+        "summary": "Get Room Timeline",
+        "description": "Thermogram, program lanes and status of one room over the requested range.",
+        "operationId": "getRoomTimeline",
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Room Id"
+            }
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "24h",
+                "7d"
+              ],
+              "type": "string",
+              "default": "24h",
+              "title": "Range"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomTimeline"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "No data source until M2.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clima/overview": {
+      "get": {
+        "tags": [
+          "clima"
+        ],
+        "summary": "Get Clima Overview",
+        "description": "One row per room over the requested range.",
+        "operationId": "getClimaOverview",
+        "parameters": [
+          {
+            "name": "range",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "24h",
+                "7d"
+              ],
+              "type": "string",
+              "default": "24h",
+              "title": "Range"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClimaOverview"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "No data source until M2.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/overrides": {
+      "post": {
+        "tags": [
+          "overrides"
+        ],
+        "summary": "Create Override",
+        "description": "Apply a temporary override or a permanent program change to one slot.",
+        "operationId": "createOverride",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OverrideCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Override"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "No data source until M2.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/overrides/{override_id}": {
+      "delete": {
+        "tags": [
+          "overrides"
+        ],
+        "summary": "Delete Override",
+        "description": "Revert a stored override.",
+        "operationId": "deleteOverride",
+        "parameters": [
+          {
+            "name": "override_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Override Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "503": {
+            "description": "No data source until M2.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AdapterTypes": {
+        "properties": {
+          "driver": {
+            "type": "string",
+            "title": "Driver"
+          },
+          "program": {
+            "type": "string",
+            "title": "Program"
+          },
+          "override": {
+            "type": "string",
+            "title": "Override"
+          },
+          "power": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Power"
+          }
+        },
+        "type": "object",
+        "required": [
+          "driver",
+          "program",
+          "override",
+          "power"
+        ],
+        "title": "AdapterTypes"
+      },
+      "ApiError": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ApiError",
+        "description": "Error body of the public API."
+      },
+      "ClimaOverview": {
+        "properties": {
+          "clock": {
+            "$ref": "#/components/schemas/ClockInfo"
+          },
+          "grid": {
+            "$ref": "#/components/schemas/TimeGrid"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "outdoor": {
+            "$ref": "#/components/schemas/OutdoorSeries"
+          },
+          "sources": {
+            "$ref": "#/components/schemas/SourceCapabilities"
+          }
+        },
+        "type": "object",
+        "required": [
+          "clock",
+          "grid",
+          "rows",
+          "outdoor",
+          "sources"
+        ],
+        "title": "ClimaOverview",
+        "description": "``GET /api/clima/overview``."
+      },
+      "ClockInfo": {
+        "properties": {
+          "now": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Now"
+          },
+          "timeZone": {
+            "type": "string",
+            "title": "Timezone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "now",
+          "timeZone"
+        ],
+        "title": "ClockInfo"
+      },
+      "DriverCapabilities": {
+        "properties": {
+          "modes": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "heat",
+                "cool",
+                "heat_cool",
+                "auto",
+                "dry",
+                "fan_only",
+                "off"
+              ]
+            },
+            "type": "array",
+            "title": "Modes"
+          },
+          "readsAction": {
+            "type": "boolean",
+            "title": "Readsaction"
+          },
+          "readsTarget": {
+            "type": "boolean",
+            "title": "Readstarget"
+          },
+          "writesMode": {
+            "type": "boolean",
+            "title": "Writesmode"
+          },
+          "writesTarget": {
+            "type": "boolean",
+            "title": "Writestarget"
+          }
+        },
+        "type": "object",
+        "required": [
+          "modes",
+          "readsAction",
+          "readsTarget",
+          "writesMode",
+          "writesTarget"
+        ],
+        "title": "DriverCapabilities"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
       "HealthResponse": {
         "properties": {
           "status": {
@@ -69,6 +492,2067 @@
           "status"
         ],
         "title": "HealthResponse"
+      },
+      "HistoryCapabilities": {
+        "properties": {
+          "maxLookbackDays": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maxlookbackdays"
+          },
+          "resolutionMin": {
+            "type": "integer",
+            "title": "Resolutionmin"
+          },
+          "actionHistory": {
+            "type": "boolean",
+            "title": "Actionhistory"
+          }
+        },
+        "type": "object",
+        "required": [
+          "maxLookbackDays",
+          "resolutionMin",
+          "actionHistory"
+        ],
+        "title": "HistoryCapabilities"
+      },
+      "Hysteresis": {
+        "properties": {
+          "belowC": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Belowc",
+            "default": 0.3
+          },
+          "aboveC": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Abovec",
+            "default": 0.2
+          }
+        },
+        "type": "object",
+        "required": [
+          "belowC",
+          "aboveC"
+        ],
+        "title": "Hysteresis",
+        "description": "Comfort band around the target of a thermostatic system."
+      },
+      "Level": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-z0-9][a-z0-9_-]*$",
+            "title": "Id"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "labelKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Labelkey"
+          },
+          "targetC": {
+            "type": "number",
+            "title": "Targetc"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "labelKey",
+          "targetC"
+        ],
+        "title": "Level",
+        "description": "A named target value that slots refer to (representation ``levels``)."
+      },
+      "NextProgramChange": {
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "change": {
+            "type": "string",
+            "enum": [
+              "target",
+              "on",
+              "off"
+            ],
+            "title": "Change"
+          },
+          "targetC": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Targetc"
+          }
+        },
+        "type": "object",
+        "required": [
+          "at",
+          "change",
+          "targetC"
+        ],
+        "title": "NextProgramChange"
+      },
+      "OutdoorCapabilities": {
+        "properties": {
+          "current": {
+            "type": "boolean",
+            "title": "Current"
+          },
+          "history": {
+            "type": "boolean",
+            "title": "History"
+          },
+          "forecastHours": {
+            "type": "integer",
+            "title": "Forecasthours"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current",
+          "history",
+          "forecastHours"
+        ],
+        "title": "OutdoorCapabilities"
+      },
+      "OutdoorSeries": {
+        "properties": {
+          "measuredC": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Measuredc"
+          },
+          "forecastC": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Forecastc"
+          },
+          "measuredHumidityPct": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Measuredhumiditypct"
+          },
+          "forecastHumidityPct": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Forecasthumiditypct"
+          },
+          "nowC": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nowc"
+          },
+          "nowHumidityPct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nowhumiditypct"
+          }
+        },
+        "type": "object",
+        "required": [
+          "measuredC",
+          "forecastC",
+          "measuredHumidityPct",
+          "forecastHumidityPct",
+          "nowC",
+          "nowHumidityPct"
+        ],
+        "title": "OutdoorSeries"
+      },
+      "Override": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "systemId": {
+            "type": "string",
+            "title": "Systemid"
+          },
+          "slotRef": {
+            "type": "string",
+            "title": "Slotref"
+          },
+          "day": {
+            "type": "string",
+            "enum": [
+              "mon",
+              "tue",
+              "wed",
+              "thu",
+              "fri",
+              "sat",
+              "sun"
+            ],
+            "title": "Day"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "slot",
+              "until",
+              "permanentValue",
+              "permanentTimes"
+            ],
+            "title": "Scope"
+          },
+          "change": {
+            "$ref": "#/components/schemas/OverrideChange"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "active",
+              "expired",
+              "reverted",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Validfrom"
+          },
+          "validUntil": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validuntil"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "systemId",
+          "slotRef",
+          "day",
+          "scope",
+          "change",
+          "status",
+          "validFrom",
+          "validUntil"
+        ],
+        "title": "Override",
+        "description": "A stored change and its lifecycle state."
+      },
+      "OverrideCapabilities": {
+        "properties": {
+          "scopes": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "slot",
+                "until"
+              ]
+            },
+            "type": "array",
+            "title": "Scopes"
+          },
+          "futureSlots": {
+            "type": "boolean",
+            "title": "Futureslots"
+          },
+          "step": {
+            "type": "number",
+            "title": "Step"
+          },
+          "minDelta": {
+            "type": "number",
+            "title": "Mindelta"
+          },
+          "maxDelta": {
+            "type": "number",
+            "title": "Maxdelta"
+          },
+          "expiry": {
+            "type": "string",
+            "enum": [
+              "external",
+              "hestia"
+            ],
+            "title": "Expiry"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scopes",
+          "futureSlots",
+          "step",
+          "minDelta",
+          "maxDelta",
+          "expiry"
+        ],
+        "title": "OverrideCapabilities"
+      },
+      "OverrideChange": {
+        "properties": {
+          "deltaC": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deltac"
+          },
+          "targetC": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Targetc"
+          },
+          "levelValueC": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Levelvaluec"
+          },
+          "from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?:(?:[01]\\d|2[0-3]):[0-5]\\d|24:00)$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To"
+          },
+          "days": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "mon",
+                    "tue",
+                    "wed",
+                    "thu",
+                    "fri",
+                    "sat",
+                    "sun"
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "deltaC",
+          "targetC",
+          "levelValueC",
+          "from",
+          "to",
+          "days"
+        ],
+        "title": "OverrideChange",
+        "description": "What changes; which fields are set depends on the scope (see ``OverrideCreate``)."
+      },
+      "OverrideCreate": {
+        "properties": {
+          "systemId": {
+            "type": "string",
+            "title": "Systemid"
+          },
+          "slotRef": {
+            "type": "string",
+            "title": "Slotref"
+          },
+          "day": {
+            "type": "string",
+            "enum": [
+              "mon",
+              "tue",
+              "wed",
+              "thu",
+              "fri",
+              "sat",
+              "sun"
+            ],
+            "title": "Day"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "slot",
+              "until",
+              "permanentValue",
+              "permanentTimes"
+            ],
+            "title": "Scope"
+          },
+          "change": {
+            "$ref": "#/components/schemas/OverrideChange"
+          },
+          "validUntil": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validuntil"
+          }
+        },
+        "type": "object",
+        "required": [
+          "systemId",
+          "slotRef",
+          "day",
+          "scope",
+          "change",
+          "validUntil"
+        ],
+        "title": "OverrideCreate",
+        "description": "Request to change one slot occurrence (``slot_ref`` is unique within ``day``).\n\nFields of ``change`` per scope: ``slot`` exactly one of target_c / delta_c; ``until``\ntarget_c plus ``valid_until``; ``permanentValue`` exactly one of level_value_c / target_c;\n``permanentTimes`` from_ and to (from_ < to), days optional."
+      },
+      "OverviewRow": {
+        "properties": {
+          "room": {
+            "$ref": "#/components/schemas/RoomView"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RoomStatus"
+          },
+          "climate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RoomClimateSeries"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "target": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TargetSeries"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "systems": {
+            "items": {
+              "$ref": "#/components/schemas/SystemSeries"
+            },
+            "type": "array",
+            "title": "Systems"
+          }
+        },
+        "type": "object",
+        "required": [
+          "room",
+          "status",
+          "climate",
+          "target",
+          "systems"
+        ],
+        "title": "OverviewRow"
+      },
+      "PowerCapabilities": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "measured",
+              "estimated",
+              "none"
+            ],
+            "title": "Kind"
+          },
+          "energyTotals": {
+            "type": "boolean",
+            "title": "Energytotals"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "energyTotals"
+        ],
+        "title": "PowerCapabilities"
+      },
+      "PowerSummary": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "measured",
+              "estimated",
+              "mixed",
+              "none"
+            ],
+            "title": "Kind"
+          },
+          "nowKw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nowkw"
+          },
+          "last24HKwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last24Hkwh"
+          },
+          "last24HCost": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last24Hcost"
+          },
+          "month": {
+            "type": "integer",
+            "title": "Month"
+          },
+          "monthKwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthkwh"
+          },
+          "monthCost": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthcost"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "tariffPerKwh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tariffperkwh"
+          },
+          "measuredSystemIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Measuredsystemids"
+          },
+          "unmeasuredKinds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Unmeasuredkinds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "nowKw",
+          "last24HKwh",
+          "last24HCost",
+          "month",
+          "monthKwh",
+          "monthCost",
+          "currency",
+          "tariffPerKwh",
+          "measuredSystemIds",
+          "unmeasuredKinds"
+        ],
+        "title": "PowerSummary"
+      },
+      "Program": {
+        "properties": {
+          "representation": {
+            "type": "string",
+            "enum": [
+              "levels",
+              "perSlot",
+              "onOff",
+              "none"
+            ],
+            "title": "Representation"
+          },
+          "levels": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Level"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Levels"
+          },
+          "days": {
+            "$ref": "#/components/schemas/WeekDays"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "representation",
+          "levels",
+          "days",
+          "version"
+        ],
+        "title": "Program",
+        "description": "Weekly program of one system. Gaps between slots are allowed (= not programmed)."
+      },
+      "ProgramCapabilities": {
+        "properties": {
+          "read": {
+            "type": "boolean",
+            "title": "Read"
+          },
+          "representation": {
+            "type": "string",
+            "enum": [
+              "levels",
+              "perSlot",
+              "onOff",
+              "none"
+            ],
+            "title": "Representation"
+          },
+          "writeLevelValues": {
+            "type": "boolean",
+            "title": "Writelevelvalues"
+          },
+          "writeSlotValue": {
+            "type": "boolean",
+            "title": "Writeslotvalue"
+          },
+          "writeTimes": {
+            "type": "boolean",
+            "title": "Writetimes"
+          },
+          "dayScope": {
+            "type": "string",
+            "enum": [
+              "perDay",
+              "all"
+            ],
+            "title": "Dayscope"
+          },
+          "minuteStep": {
+            "type": "integer",
+            "maximum": 60.0,
+            "minimum": 1.0,
+            "title": "Minutestep"
+          },
+          "maxSlotsPerDay": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maxslotsperday"
+          }
+        },
+        "type": "object",
+        "required": [
+          "read",
+          "representation",
+          "writeLevelValues",
+          "writeSlotValue",
+          "writeTimes",
+          "dayScope",
+          "minuteStep",
+          "maxSlotsPerDay"
+        ],
+        "title": "ProgramCapabilities"
+      },
+      "ProgramSegment": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "startIndex": {
+            "type": "integer",
+            "title": "Startindex"
+          },
+          "endIndex": {
+            "type": "integer",
+            "title": "Endindex"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End"
+          },
+          "slotRef": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slotref"
+          },
+          "day": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "mon",
+                  "tue",
+                  "wed",
+                  "thu",
+                  "fri",
+                  "sat",
+                  "sun"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day"
+          },
+          "slotFrom": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slotfrom"
+          },
+          "slotTo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slotto"
+          },
+          "levelId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Levelid"
+          },
+          "targetC": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Targetc"
+          },
+          "programmedTargetC": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Programmedtargetc"
+          },
+          "on": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "On"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "past",
+              "current",
+              "future"
+            ],
+            "title": "State"
+          },
+          "edited": {
+            "type": "boolean",
+            "title": "Edited"
+          },
+          "overrideId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overrideid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "startIndex",
+          "endIndex",
+          "start",
+          "end",
+          "slotRef",
+          "day",
+          "slotFrom",
+          "slotTo",
+          "levelId",
+          "targetC",
+          "programmedTargetC",
+          "on",
+          "state",
+          "edited",
+          "overrideId"
+        ],
+        "title": "ProgramSegment",
+        "description": "One run of one slot occurrence with one effective value, clipped to the grid."
+      },
+      "RoomClimateSeries": {
+        "properties": {
+          "measuredC": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Measuredc"
+          },
+          "forecastC": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Forecastc"
+          },
+          "measuredHumidityPct": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Measuredhumiditypct"
+          },
+          "forecastHumidityPct": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Forecasthumiditypct"
+          }
+        },
+        "type": "object",
+        "required": [
+          "measuredC",
+          "forecastC",
+          "measuredHumidityPct",
+          "forecastHumidityPct"
+        ],
+        "title": "RoomClimateSeries"
+      },
+      "RoomStatus": {
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "title": "Roomid"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "nameKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Namekey"
+          },
+          "hasSensor": {
+            "type": "boolean",
+            "title": "Hassensor"
+          },
+          "followsRoomId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Followsroomid"
+          },
+          "temperatureC": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperaturec"
+          },
+          "humidityPct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Humiditypct"
+          },
+          "systems": {
+            "items": {
+              "$ref": "#/components/schemas/SystemStatus"
+            },
+            "type": "array",
+            "title": "Systems"
+          }
+        },
+        "type": "object",
+        "required": [
+          "roomId",
+          "name",
+          "nameKey",
+          "hasSensor",
+          "followsRoomId",
+          "temperatureC",
+          "humidityPct",
+          "systems"
+        ],
+        "title": "RoomStatus"
+      },
+      "RoomTimeline": {
+        "properties": {
+          "clock": {
+            "$ref": "#/components/schemas/ClockInfo"
+          },
+          "grid": {
+            "$ref": "#/components/schemas/TimeGrid"
+          },
+          "room": {
+            "$ref": "#/components/schemas/RoomView"
+          },
+          "rooms": {
+            "items": {
+              "$ref": "#/components/schemas/RoomStatus"
+            },
+            "type": "array",
+            "title": "Rooms"
+          },
+          "climate": {
+            "$ref": "#/components/schemas/RoomClimateSeries"
+          },
+          "target": {
+            "$ref": "#/components/schemas/TargetSeries"
+          },
+          "lanes": {
+            "items": {
+              "$ref": "#/components/schemas/SystemLane"
+            },
+            "type": "array",
+            "title": "Lanes"
+          },
+          "outdoor": {
+            "$ref": "#/components/schemas/OutdoorSeries"
+          },
+          "power": {
+            "$ref": "#/components/schemas/PowerSummary"
+          },
+          "systems": {
+            "items": {
+              "$ref": "#/components/schemas/SystemView"
+            },
+            "type": "array",
+            "title": "Systems"
+          },
+          "overrides": {
+            "items": {
+              "$ref": "#/components/schemas/Override"
+            },
+            "type": "array",
+            "title": "Overrides"
+          },
+          "sources": {
+            "$ref": "#/components/schemas/SourceCapabilities"
+          }
+        },
+        "type": "object",
+        "required": [
+          "clock",
+          "grid",
+          "room",
+          "rooms",
+          "climate",
+          "target",
+          "lanes",
+          "outdoor",
+          "power",
+          "systems",
+          "overrides",
+          "sources"
+        ],
+        "title": "RoomTimeline",
+        "description": "``GET /api/clima/rooms/{room_id}/timeline``."
+      },
+      "RoomView": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "nameKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Namekey"
+          },
+          "hasSensor": {
+            "type": "boolean",
+            "title": "Hassensor"
+          },
+          "followsRoomId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Followsroomid"
+          },
+          "systemIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Systemids"
+          },
+          "displayTargetSystemId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Displaytargetsystemid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "nameKey",
+          "hasSensor",
+          "followsRoomId",
+          "systemIds",
+          "displayTargetSystemId"
+        ],
+        "title": "RoomView"
+      },
+      "Slot": {
+        "properties": {
+          "from": {
+            "type": "string",
+            "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d$",
+            "title": "From"
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^(?:(?:[01]\\d|2[0-3]):[0-5]\\d|24:00)$",
+            "title": "To"
+          },
+          "levelId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Levelid"
+          },
+          "targetC": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Targetc"
+          },
+          "on": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "On"
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Ref"
+          }
+        },
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "levelId",
+          "targetC",
+          "on",
+          "ref"
+        ],
+        "title": "Slot",
+        "description": "A time range of one day with its value; the field used depends on the representation."
+      },
+      "SourceCapabilities": {
+        "properties": {
+          "history": {
+            "$ref": "#/components/schemas/HistoryCapabilities"
+          },
+          "outdoor": {
+            "$ref": "#/components/schemas/OutdoorCapabilities"
+          }
+        },
+        "type": "object",
+        "required": [
+          "history",
+          "outdoor"
+        ],
+        "title": "SourceCapabilities"
+      },
+      "SystemCapabilities": {
+        "properties": {
+          "program": {
+            "$ref": "#/components/schemas/ProgramCapabilities"
+          },
+          "override": {
+            "$ref": "#/components/schemas/OverrideCapabilities"
+          },
+          "driver": {
+            "$ref": "#/components/schemas/DriverCapabilities"
+          },
+          "power": {
+            "$ref": "#/components/schemas/PowerCapabilities"
+          }
+        },
+        "type": "object",
+        "required": [
+          "program",
+          "override",
+          "driver",
+          "power"
+        ],
+        "title": "SystemCapabilities"
+      },
+      "SystemLane": {
+        "properties": {
+          "systemId": {
+            "type": "string",
+            "title": "Systemid"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "nameKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Namekey"
+          },
+          "targetC": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Targetc"
+          },
+          "action": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "heat",
+                    "cool",
+                    "dry",
+                    "idle",
+                    "off"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Action"
+          },
+          "mode": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "heat",
+                    "cool",
+                    "heat_cool",
+                    "auto",
+                    "dry",
+                    "fan_only",
+                    "off"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Mode"
+          },
+          "representation": {
+            "type": "string",
+            "enum": [
+              "levels",
+              "perSlot",
+              "onOff",
+              "none"
+            ],
+            "title": "Representation"
+          },
+          "segments": {
+            "items": {
+              "$ref": "#/components/schemas/ProgramSegment"
+            },
+            "type": "array",
+            "title": "Segments"
+          },
+          "nextChange": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NextProgramChange"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "systemId",
+          "kind",
+          "name",
+          "nameKey",
+          "targetC",
+          "action",
+          "mode",
+          "representation",
+          "segments",
+          "nextChange"
+        ],
+        "title": "SystemLane"
+      },
+      "SystemSeries": {
+        "properties": {
+          "systemId": {
+            "type": "string",
+            "title": "Systemid"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "nameKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Namekey"
+          },
+          "targetC": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Targetc"
+          },
+          "action": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "heat",
+                    "cool",
+                    "dry",
+                    "idle",
+                    "off"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Action"
+          },
+          "mode": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "heat",
+                    "cool",
+                    "heat_cool",
+                    "auto",
+                    "dry",
+                    "fan_only",
+                    "off"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Mode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "systemId",
+          "kind",
+          "name",
+          "nameKey",
+          "targetC",
+          "action",
+          "mode"
+        ],
+        "title": "SystemSeries"
+      },
+      "SystemState": {
+        "properties": {
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "heat",
+                  "cool",
+                  "heat_cool",
+                  "auto",
+                  "dry",
+                  "fan_only",
+                  "off"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode"
+          },
+          "action": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "heat",
+                  "cool",
+                  "dry",
+                  "idle",
+                  "off"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "targetC": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Targetc"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mode",
+          "action",
+          "targetC"
+        ],
+        "title": "SystemState",
+        "description": "State of a system at ``clock.now``."
+      },
+      "SystemStatus": {
+        "properties": {
+          "systemId": {
+            "type": "string",
+            "title": "Systemid"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "nameKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Namekey"
+          },
+          "action": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "heat",
+                  "cool",
+                  "dry",
+                  "idle",
+                  "off"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "heat",
+                  "cool",
+                  "heat_cool",
+                  "auto",
+                  "dry",
+                  "fan_only",
+                  "off"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode"
+          },
+          "targetC": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Targetc"
+          },
+          "viaRoomId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Viaroomid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "systemId",
+          "kind",
+          "name",
+          "nameKey",
+          "action",
+          "mode",
+          "targetC",
+          "viaRoomId"
+        ],
+        "title": "SystemStatus",
+        "description": "One system as seen from one room, at ``clock.now``."
+      },
+      "SystemView": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "nameKey": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Namekey"
+          },
+          "roomIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Roomids"
+          },
+          "primaryRoomId": {
+            "type": "string",
+            "title": "Primaryroomid"
+          },
+          "behavior": {
+            "type": "string",
+            "enum": [
+              "thermostatic",
+              "always_on_target",
+              "mode_based",
+              "unknown"
+            ],
+            "title": "Behavior"
+          },
+          "hysteresis": {
+            "$ref": "#/components/schemas/Hysteresis"
+          },
+          "capabilities": {
+            "$ref": "#/components/schemas/SystemCapabilities"
+          },
+          "program": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Program"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "$ref": "#/components/schemas/SystemState"
+          },
+          "adapters": {
+            "$ref": "#/components/schemas/AdapterTypes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "nameKey",
+          "roomIds",
+          "primaryRoomId",
+          "behavior",
+          "hysteresis",
+          "capabilities",
+          "program",
+          "state",
+          "adapters"
+        ],
+        "title": "SystemView"
+      },
+      "TargetSeries": {
+        "properties": {
+          "targetC": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Targetc"
+          },
+          "comfortLowC": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Comfortlowc"
+          },
+          "comfortHighC": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Comforthighc"
+          },
+          "sourceSystemIds": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Sourcesystemids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "targetC",
+          "comfortLowC",
+          "comfortHighC",
+          "sourceSystemIds"
+        ],
+        "title": "TargetSeries",
+        "description": "Comfort band of the thermogram."
+      },
+      "TimeGrid": {
+        "properties": {
+          "range": {
+            "type": "string",
+            "enum": [
+              "24h",
+              "7d"
+            ],
+            "title": "Range"
+          },
+          "stepMinutes": {
+            "type": "integer",
+            "title": "Stepminutes"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "nowIndex": {
+            "type": "integer",
+            "title": "Nowindex"
+          },
+          "t": {
+            "items": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "type": "array",
+            "title": "T"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "range",
+          "stepMinutes",
+          "count",
+          "nowIndex",
+          "t",
+          "end"
+        ],
+        "title": "TimeGrid"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       },
       "VersionResponse": {
         "properties": {
@@ -87,6 +2571,71 @@
           "apiVersion"
         ],
         "title": "VersionResponse"
+      },
+      "WeekDays": {
+        "properties": {
+          "mon": {
+            "items": {
+              "$ref": "#/components/schemas/Slot"
+            },
+            "type": "array",
+            "title": "Mon"
+          },
+          "tue": {
+            "items": {
+              "$ref": "#/components/schemas/Slot"
+            },
+            "type": "array",
+            "title": "Tue"
+          },
+          "wed": {
+            "items": {
+              "$ref": "#/components/schemas/Slot"
+            },
+            "type": "array",
+            "title": "Wed"
+          },
+          "thu": {
+            "items": {
+              "$ref": "#/components/schemas/Slot"
+            },
+            "type": "array",
+            "title": "Thu"
+          },
+          "fri": {
+            "items": {
+              "$ref": "#/components/schemas/Slot"
+            },
+            "type": "array",
+            "title": "Fri"
+          },
+          "sat": {
+            "items": {
+              "$ref": "#/components/schemas/Slot"
+            },
+            "type": "array",
+            "title": "Sat"
+          },
+          "sun": {
+            "items": {
+              "$ref": "#/components/schemas/Slot"
+            },
+            "type": "array",
+            "title": "Sun"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+        ],
+        "title": "WeekDays",
+        "description": "Slots of each weekday, sorted by start time."
       }
     }
   }

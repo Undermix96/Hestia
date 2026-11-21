@@ -18,6 +18,8 @@ RUN --mount=type=cache,target=/root/.npm \
 # without a .dockerignore).
 COPY frontend/index.html frontend/tsconfig.json frontend/vite.config.ts ./
 COPY frontend/src ./src
+# The message catalogs live at the repository root; src/i18n imports ../../../locales.
+COPY locales /src/locales
 RUN npm run build
 
 # ---- Runtime stage -----------------------------------------------------------

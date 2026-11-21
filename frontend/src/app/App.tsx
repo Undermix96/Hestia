@@ -1,16 +1,17 @@
-import { t } from '../i18n';
-import { VersionStatus } from './VersionStatus';
+import { useState } from 'react';
+import { RouterProvider } from 'react-router';
+import { DataSourceProvider } from '../api/datasource/context';
+import type { DataSource } from '../api/datasource/types';
+import { AppMotionConfig } from './motion';
+import { createAppRouter } from './router';
 
-export function App() {
+export function App({ dataSource }: { dataSource: DataSource }) {
+  const [router] = useState(() => createAppRouter());
   return (
-    <>
-      <header className="header">
-        <h1 className="header__title">{t('app.title')}</h1>
-        <p className="header__tagline">{t('app.tagline')}</p>
-      </header>
-      <main className="main">
-        <VersionStatus />
-      </main>
-    </>
+    <DataSourceProvider value={dataSource}>
+      <AppMotionConfig>
+        <RouterProvider router={router} />
+      </AppMotionConfig>
+    </DataSourceProvider>
   );
 }

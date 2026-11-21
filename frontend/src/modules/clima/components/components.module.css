@@ -1,0 +1,182 @@
+/* Shared clima UI primitives (HANDOFF design system; mockup inline styles). */
+
+/* RangeSelector */
+.range {
+  display: flex;
+  padding: 3px;
+  gap: 2px;
+  border-radius: 12px;
+  background: var(--c-panel-2);
+}
+
+.rangeButton {
+  border: 0;
+  border-radius: var(--radius-seg-btn);
+  background: transparent;
+  color: var(--c-text-2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.25s,
+    color 0.25s;
+}
+
+.rangeButton[aria-pressed='false']:hover {
+  color: var(--c-text);
+}
+
+.rangeButton[aria-pressed='true'] {
+  background: var(--c-light);
+  color: var(--c-bg-ink);
+}
+
+.rangeStanza {
+  padding: 8px 14px;
+}
+
+.rangeTutte {
+  height: 38px;
+  padding: 0 14px;
+}
+
+/* StatusDot */
+.dot {
+  display: inline-block;
+  flex: none;
+  width: 7px;
+  height: 7px;
+}
+
+.dotSquare {
+  border-radius: 2px;
+}
+
+.dotRound {
+  border-radius: 50%;
+}
+
+/* SystemStatusLine */
+.statusLine {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* LegendSwatch */
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  display: inline-block;
+  flex: none;
+}
+
+.swatchLine {
+  width: 16px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--c-text);
+}
+
+.swatchDotted {
+  width: 16px;
+  height: 0;
+  border-top: 3px dotted var(--c-text);
+}
+
+.swatchDashed {
+  width: 16px;
+  height: 0;
+  border-top: 2px dashed var(--c-target);
+}
+
+.swatchBand {
+  width: 16px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--c-band);
+}
+
+.swatchHumidity {
+  width: 16px;
+  height: 8px;
+  background: var(--c-hum-legend);
+  border-top: 1.5px solid var(--c-hum);
+}
+
+.swatchBlock {
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.swatchBlockSmall {
+  width: 14px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.swatchOff {
+  background: var(--c-lane);
+  border: 1px solid var(--c-border-2);
+}
+
+/* NowLine */
+.nowLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--c-heat);
+  pointer-events: none;
+}
+
+.nowDot {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c-heat);
+  box-shadow: 0 0 0 4px var(--c-now-glow);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* ForecastHatch */
+.hatch {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--pattern-forecast);
+  pointer-events: none;
+}
+
+.hatchRounded {
+  border-radius: 0 10px 10px 0;
+}
+
+/* AxisLabels */
+.axis {
+  position: relative;
+  height: 14px;
+  font-size: 10px;
+  color: var(--c-muted);
+}
+
+.axisTick {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.axisNow {
+  color: var(--c-heat);
+}

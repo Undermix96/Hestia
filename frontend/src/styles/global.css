@@ -1,3 +1,5 @@
+/* Global base styles. Component styles live in CSS Modules next to the components. */
+
 *,
 *::before,
 *::after {
@@ -6,59 +8,47 @@
 
 body {
   margin: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
+  min-height: 100vh;
+  background: var(--c-bg);
+  color: var(--c-text);
   font-family: var(--font-sans);
-  line-height: 1.5;
 }
 
-.header {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+a {
+  color: var(--c-text);
 }
 
-.header__title {
-  margin: 0;
-  font-size: 1.5rem;
-  color: var(--color-accent);
+a:hover {
+  color: var(--c-target);
 }
 
-.header__tagline {
-  margin: 0;
-  color: var(--color-text-muted);
+button {
+  font: inherit;
 }
 
-.main {
-  padding: var(--space-4);
+/* Numbers in the UI: tabular figures so values do not jump. */
+.num {
+  font-variant-numeric: tabular-nums;
 }
 
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: 0;
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+.mono {
+  font-family: var(--font-mono);
 }
 
-.status__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-text-muted);
+/* Hidden visually, still read by assistive technology. */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
-.status[data-state='ok'] .status__dot {
-  background: var(--color-ok);
-}
-
-.status[data-state='error'] .status__dot {
-  background: var(--color-error);
+:focus-visible {
+  outline: 2px solid var(--c-target);
+  outline-offset: 2px;
 }

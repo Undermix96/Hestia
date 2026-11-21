@@ -10,8 +10,8 @@ fix, please open an issue first so we can agree on the approach.
 
 - Code, comments, commit messages and contributor docs are in **English**.
   User-facing docs (README) exist in English and Italian; keep both in sync.
-- No user-visible text hard-coded in the code: use the translation files
-  (frontend `src/i18n/`, and [`locales/`](locales/README.md) as the project grows).
+- No user-visible text hard-coded in the code: add a message to
+  [`locales/it.json`](locales/README.md) and read it with `t()` (frontend `src/i18n/`).
 - Keep the core pure: `backend/hestia/core` must not depend on adapters, the web
   framework or any I/O library. `import-linter` enforces this.
 - Never assume a specific Home Assistant setup in the core or the UI: express
@@ -50,6 +50,7 @@ uv run python -m hestia.export_openapi --check
 
 # frontend/
 npm ci
+npm run check:api
 npm run lint
 npm run typecheck
 npm run test
@@ -58,9 +59,10 @@ npx playwright install chromium   # once
 npm run e2e
 ```
 
-If you change the API, regenerate the contract with
-`uv run python -m hestia.export_openapi` (from `backend/`) and commit
-`contract/openapi.json` together with your change.
+If you change the API (an endpoint or a backend model), regenerate the contract with
+`uv run python -m hestia.export_openapi` (from `backend/`), then the frontend types with
+`npm run gen:api` (from `frontend/`), and commit `contract/openapi.json` and
+`frontend/src/api/schema.d.ts` together with your change. Never edit either file by hand.
 
 To try the images locally (build context is the repository root):
 

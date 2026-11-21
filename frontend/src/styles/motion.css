@@ -1,0 +1,129 @@
+/*
+ * Global animation classes (docs/design/HANDOFF.md §4, mockup classes).
+ * Class names are exported as constants from motion.ts: use those, not strings.
+ * Never reveal lines with stroke-dasharray + pathLength (HANDOFF §4): the
+ * measured line uses a clip-path reveal.
+ */
+
+/* Block entrance cascade */
+.m-enter {
+  opacity: 0;
+  animation: m-enter 0.9s var(--ease-enter) forwards;
+}
+@keyframes m-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.m-e1 {
+  animation-delay: 0.08s;
+}
+.m-e2 {
+  animation-delay: 0.16s;
+}
+.m-e3 {
+  animation-delay: 0.24s;
+}
+.m-e4 {
+  animation-delay: 0.32s;
+}
+
+/* SVG path morph on data change (room, range, draft) */
+.m-morph {
+  transition: d 0.6s var(--ease-morph);
+}
+
+/* Measured line reveal */
+.m-drawp {
+  animation: m-dp 1.2s var(--ease-draw) both;
+}
+@keyframes m-dp {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Forecast line fade-in after the reveal */
+.m-drawf {
+  opacity: 0;
+  animation: m-df 0.8s ease 1s forwards;
+}
+@keyframes m-df {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Program/action bars grow from the left */
+.m-grow {
+  transform-origin: left;
+  animation: m-grow 1s var(--ease-enter) 0.2s both;
+}
+@keyframes m-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Ring around the dot of an active system */
+.m-pulse {
+  position: relative;
+}
+.m-pulse::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  animation: m-ring 1.8s ease-out infinite;
+}
+@keyframes m-ring {
+  from {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+/* "Now" dot glow */
+.m-nowp {
+  animation: m-np 2.4s ease-in-out infinite;
+}
+@keyframes m-np {
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 138, 76, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-enter,
+  .m-drawp,
+  .m-drawf,
+  .m-grow {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+  .m-pulse::after,
+  .m-nowp {
+    animation: none;
+  }
+  .m-morph {
+    transition: none;
+  }
+}

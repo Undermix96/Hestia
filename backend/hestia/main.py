@@ -2,7 +2,8 @@
 
 from fastapi import FastAPI
 
-from hestia.api import system
+from hestia.api import clima, overrides, system
+from hestia.api.errors import install_error_handlers
 from hestia.api.system import API_VERSION
 
 
@@ -18,6 +19,9 @@ def create_app() -> FastAPI:
         redoc_url=None,
     )
     app.include_router(system.router, prefix="/api")
+    app.include_router(clima.router, prefix="/api")
+    app.include_router(overrides.router, prefix="/api")
+    install_error_handlers(app)
     return app
 
 

@@ -1,31 +1,94 @@
-/* Design tokens. Components use these variables, never raw values. */
+/*
+ * Design tokens (docs/design/HANDOFF.md, design system). Single dark theme.
+ * Components use these variables, never raw values. JS-computed colours come
+ * from src/modules/clima/logic/colors.ts (PALETTE), which mirrors these values.
+ */
 :root {
-  --color-bg: #f7f5f2;
-  --color-surface: #ffffff;
-  --color-text: #1f1c19;
-  --color-text-muted: #6b645c;
-  --color-accent: #d9622b;
-  --color-ok: #2f8a4c;
-  --color-error: #c23b33;
-  --color-border: #e4dfd8;
+  /* Surfaces and lines */
+  --c-bg: #0E1215;
+  --c-panel: #151A1E;
+  --c-panel-2: #1E252A;
+  --c-lane: #1A2025;
+  --c-out-bg: #12171A;
+  --c-grid: #1F262B;
+  --c-border: #2A333A;
+  --c-border-2: #2E383F;
+  --c-border-dashed: #46525B;
 
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 16px;
-  --space-4: 24px;
-  --radius: 8px;
-}
+  /* Text */
+  --c-text: #EEF2F4;
+  --c-text-2: #C9D1D6;
+  --c-muted: #98A3AB;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #171513;
-    --color-surface: #22201d;
-    --color-text: #f1ede8;
-    --color-text-muted: #a69e95;
-    --color-accent: #f0844f;
-    --color-ok: #5cc27c;
-    --color-error: #f06a60;
-    --color-border: #36322e;
-  }
+  /* Data */
+  --c-heat: #FF8A4C;
+  --c-target: #FFB07A;
+  --c-band: rgba(255,176,122,.16);
+  --c-cool: #4FB3FF;
+  --c-dry: #59D3B4;
+  --c-hum: #59D3B4;
+  --c-hum-area: rgba(89,211,180,.13);
+  --c-hum-legend: rgba(89,211,180,.16);
+  --c-out: #8EA2FF;
+  --c-out-hum: #7FD8C8;
+  --c-out-hum-area: rgba(127,216,200,.10);
+  --c-ac-prog: #2E4A66;
+  --c-rad-lo: #3A5A8C;
+  --c-rad-hi: #C2622E;
+  --c-dot-idle: #6A767F;
+
+  /* Interaction */
+  --c-nav-hover: #252D33;
+  --c-row-hover: #171D21;
+  --c-now-glow: rgba(255,138,76,.3);
+
+  /* Light surfaces (active tabs, editor) */
+  --c-on-light: #151A1E;
+  --c-on-light-muted: #3A444C;
+  --c-light: #EEF2F4;
+  --c-light-track: #D5DCE1;
+  --c-light-btn: #C4CCD2;
+  --c-light-btn-hover: #B5BFC7;
+  --c-light-border: #AEB8C0;
+  --c-bg-ink: #0E1215;
+
+  /* Patterns */
+  --pattern-idle: repeating-linear-gradient(135deg,#46525B 0 3px,#2A333A 3px 6px);
+  --pattern-forecast: repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 8px,transparent 8px 16px);
+  --pattern-nodata: repeating-linear-gradient(135deg,rgba(255,255,255,.06) 0 6px,transparent 6px 12px);
+
+  /* Typography */
+  --font-sans: 'Albert Sans Variable', system-ui, sans-serif;
+  --font-mono: 'Martian Mono Variable', ui-monospace, monospace;
+
+  /* Radii */
+  --radius-panel: 28px;
+  --radius-tab: 16px;
+  --radius-pill: 999px;
+  --radius-prog: 6px;
+  --radius-act: 4px;
+  --radius-seg: 12px;
+  --radius-seg-btn: 10px;
+  --radius-editor: 20px;
+  --radius-tooltip: 14px;
+  --radius-group: 14px;
+
+  /* Layout */
+  --container-max: 1400px;
+  --page-pad: 22px 32px 48px;
+  --gap-blocks: 20px;
+  --gap-row: 18px;
+  --panel-pad: 22px;
+
+  /* Elevation */
+  --shadow-panel: 0 1px 2px rgba(0,0,0,.2);
+  --shadow-tooltip: 0 18px 40px rgba(0,0,0,.5);
+
+  /* Easing */
+  --ease-enter: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-draw: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-morph: cubic-bezier(0.3, 1, 0.4, 1);
+  --ease-pop: cubic-bezier(0.3, 1.4, 0.5, 1);
+
+  color-scheme: dark;
 }

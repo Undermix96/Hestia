@@ -1,0 +1,42 @@
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--page-pad);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-blocks);
+}
+
+/* Screens lay out their blocks with the same gap as the header. */
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-blocks);
+  min-width: 0;
+}
+
+.main:focus {
+  outline: none;
+}
+
+/* Visually hidden until focused. */
+.skipLink {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  padding: 8px 14px;
+  border-radius: var(--radius-seg-btn);
+  background: var(--c-light);
+  color: var(--c-bg-ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skipLink:focus,
+.skipLink:focus-visible {
+  transform: none;
+  color: var(--c-bg-ink);
+}

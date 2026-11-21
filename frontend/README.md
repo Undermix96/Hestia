@@ -30,26 +30,52 @@ CI runs `npm ci`, `lint`, `typecheck`, `test`, `build` and `e2e`, in that order.
 To develop against a backend that is not on `localhost:8000`, set
 `BACKEND_URL`, e.g. `BACKEND_URL=http://192.168.1.10:8000 npm run dev`.
 
+## Data source and scenarios
+
+Until the backend serves data (M2), the UI runs on a simulated data source
+(`src/api/datasource/mock/`) with a fixed clock (20 Nov 2026, 08:30,
+Europe/Rome). Two query parameters, read once when the page loads and kept by
+every in-app link and redirect, choose what you see:
+
+| Parameter | Values | Default |
+| --- | --- | --- |
+| `?scenario=` | `home`, `perSlot`, `readonly`, `noProgram`, `manyRooms` | `home` |
+| `?source=` | `mock`, `http` (the real backend; answers 503 in M1) | `mock` (`VITE_DATA_SOURCE`) |
+
+For example `http://localhost:5173/clima/tutte?scenario=manyRooms`.
+
 ## Layout
 
 ```text
 frontend/
 ├─ src/
-│  ├─ app/          App shell and top-level components
-│  ├─ api/          Backend client (one module per endpoint for now)
-│  ├─ i18n/         Message files (it.json is the default) and t()
-│  └─ styles/       tokens.css (design tokens) and global styles
+│  ├─ app/          App shell: router, layout, header, module registry, error views
+│  ├─ api/          Generated contract types (schema.d.ts), data sources (mock, http)
+│  ├─ i18n/         t() (ICU MessageFormat) and Intl number/date helpers (format.ts)
+│  ├─ lib/          Small framework-free helpers (time zones)
+│  ├─ modules/      One folder per app module (clima; energia and luci are hidden)
+│  └─ styles/       tokens.css (design tokens), global.css, motion.css/motion.ts
 ├─ tests/           Vitest unit tests
 ├─ e2e/             Playwright tests
 ├─ nginx/           nginx config template used by the Docker image
 └─ Dockerfile       Built with the repository root as context
 ```
 
+Each module (`src/modules/<id>/module.ts[x]`) registers its menu entries,
+routes and header status in `src/app/modules.ts`; hidden modules are
+registered but neither shown nor routed.
+
 ## Conventions
 
-- **No hard-coded visible strings.** Every user-facing text is a key in
-  `src/i18n/it.json`, read with `t('key', { param })`. Tests should also look up
-  expected text through `t()` or the JSON file rather than repeating it.
+- **No hard-coded visible strings.** Every user-facing text is an ICU message in
+  [`locales/it.json`](../locales/README.md) at the repository root, read with
+  `t('key', { param })` from `src/i18n`. Numbers and dates are formatted with
+  `fmt` (`src/i18n/format.ts`, `Intl`, always with an explicit time zone) and
+  passed to messages as arguments. Tests look up expected text through `t()` or
+  the JSON file rather than repeating it.
+- **Use the motion classes.** Animations are the global classes of
+  `src/styles/motion.css` (names in `motion.ts`); they stop under
+  `prefers-reduced-motion`, and Motion components follow the same setting.
 - **Use design tokens.** Colours, spacing and radii come from CSS variables in
   `src/styles/tokens.css`.
 - **E2E tests never need a real backend.** Mock every `/api/*` call with

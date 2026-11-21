@@ -3,9 +3,10 @@
 This folder holds the built-in languages of Hestia: `it.json` (Italian, the
 default) and `en.json` (English).
 
-> Status: **M0**. The files only contain the `meta` object; the messages will be
-> added starting from milestone M1, and runtime loading of extra languages
-> arrives in M3 (see [`docs/implementation-plan.md`](../docs/implementation-plan.md) §9).
+> Status: **M1**. `it.json` holds every message of the UI; `en.json` only has
+> its `meta` object for now. The frontend bundles `it.json` at build time
+> (`frontend/src/i18n/index.ts`); runtime loading of extra languages arrives in
+> M3 (see [`docs/implementation-plan.md`](../docs/implementation-plan.md) §9).
 
 ## File format
 

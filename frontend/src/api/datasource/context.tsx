@@ -1,0 +1,15 @@
+import { createContext, useContext, type ReactNode } from 'react';
+import type { DataSource } from './types';
+
+const DataSourceContext = createContext<DataSource | null>(null);
+
+export function DataSourceProvider({ value, children }: { value: DataSource; children: ReactNode }) {
+  return <DataSourceContext.Provider value={value}>{children}</DataSourceContext.Provider>;
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function useDataSource(): DataSource {
+  const ds = useContext(DataSourceContext);
+  if (!ds) throw new Error('useDataSource() used outside <DataSourceProvider>');
+  return ds;
+}
