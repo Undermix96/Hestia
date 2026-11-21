@@ -8,7 +8,8 @@ name: Docker Build
 #               (X.Y.Z, vX.Y.Z, sha-...)
 #   4. promote: moves the shared tags (X.Y, latest) of both images, only after
 #               both builds succeeded, so they always point to the same release
-#   5. release: creates and pushes the git tag, only after promote succeeded
+#   5. release: creates and pushes the git tag with the RELEASE_TOKEN secret,
+#               only after promote succeeded
 #   6. verify:  checks that both images can be pulled anonymously (no login)
 #               and that each one is published for both architectures
 on:
@@ -53,6 +54,17 @@ jobs:
         run: |
           echo "::error::Releases are published only from '${{ github.event.repository.default_branch }}' (this run is on '${{ github.ref_name }}')."
           exit 1
+
+      # Checked here, before any image is built, so a missing secret cannot
+      # leave a release half-published.
+      - name: Release token is configured
+        env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          if [[ -z "${RELEASE_TOKEN}" ]]; then
+            echo "::error::Secret RELEASE_TOKEN is missing. Create a fine-grained token with Contents and Workflows write access on this repository and save it as a repository secret named RELEASE_TOKEN (see README, 'Versioning and releases')."
+            exit 1
+          fi
 
       - name: Checkout
         uses: actions/checkout@v5
@@ -220,11 +232,16 @@ jobs:
     name: Git tag
     needs: [version, promote]
     runs-on: ubuntu-latest
+    # The tag is pushed with RELEASE_TOKEN, not GITHUB_TOKEN: GitHub refuses to
+    # let GITHUB_TOKEN push a tag onto a commit that changes .github/workflows/
+    # (it cannot have the "workflows" permission).
     permissions:
-      contents: write   # to push the git tag
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Create and push the git tag
         env:

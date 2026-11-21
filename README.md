@@ -56,8 +56,6 @@ Both images are multi-arch (`linux/amd64`, `linux/arm64`) and public: no login i
 needed to pull them. Each release publishes the tags `vX.Y.Z`, `X.Y.Z`, `X.Y`,
 `sha-<commit>` and `latest`. Always use the same tag for both images.
 
-The old single image `ghcr.io/undermix96/hestia` is **deprecated** and no longer updated.
-
 ## Versioning and releases
 
 Versions follow `vMAJOR.MINOR.PATCH`; each version is a git tag plus the two images.
@@ -80,14 +78,15 @@ Each run:
 4. moves `X.Y` and `latest` of both images to the new release, only after both
    builds succeeded, so the shared tags always match across the two images;
 5. creates and pushes the git tag `vX.Y.Z`, only after both builds succeeded;
-   see the note below on releases that change workflow files;
+   the tag is pushed with the `RELEASE_TOKEN` secret (see below);
 6. checks that both images can be pulled anonymously for both architectures.
 
-> **Git tag and workflow files:** GitHub refuses to let the default `GITHUB_TOKEN`
-> push a tag onto a commit that changes `.github/workflows/`. Until a `RELEASE_TOKEN`
-> secret (fine-grained token with *Contents* and *Workflows* write access) is wired
-> into the `release` job, create the tag by hand in that case:
-> `git tag -a vX.Y.Z -m "Release vX.Y.Z" <commit>` and `git push origin refs/tags/vX.Y.Z`.
+> **`RELEASE_TOKEN`:** GitHub refuses to let the default `GITHUB_TOKEN` push a tag
+> onto a commit that changes `.github/workflows/`, so the tag is pushed with a
+> fine-grained token saved as the repository secret `RELEASE_TOKEN`, with
+> *Contents* and *Workflows* write access on this repository only. The workflow
+> stops before building anything if the secret is missing. The token expires:
+> renew it and update the secret when it does.
 
 > **Visibility:** the packages are linked to this public repository and inherit its
 > visibility, so they are public from the first publish. If a package ever ends up

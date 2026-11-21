@@ -58,8 +58,6 @@ pubbliche: per scaricarle non serve il login. Ogni release pubblica i tag
 `vX.Y.Z`, `X.Y.Z`, `X.Y`, `sha-<commit>` e `latest`. Usa sempre lo stesso tag per
 le due immagini.
 
-La vecchia immagine unica `ghcr.io/undermix96/hestia` è **deprecata** e non viene più aggiornata.
-
 ## Versioni e release
 
 Le versioni seguono il formato `vMAJOR.MINOR.PATCH`; ogni versione corrisponde a un
@@ -83,14 +81,15 @@ Ogni esecuzione:
 4. sposta `X.Y` e `latest` di entrambe le immagini sulla nuova release, solo dopo
    che entrambe le build sono riuscite, così i tag condivisi coincidono sempre;
 5. crea e pubblica il tag git `vX.Y.Z`, solo dopo che entrambe le build sono riuscite;
-   vedi la nota sotto per le release che modificano i workflow;
+   il tag viene pubblicato con il secret `RELEASE_TOKEN` (vedi sotto);
 6. verifica che entrambe le immagini si scarichino senza login per le due architetture.
 
-> **Tag git e file dei workflow:** GitHub non permette al `GITHUB_TOKEN` di pubblicare
-> un tag su un commit che modifica `.github/workflows/`. Finché il job `release` non usa
-> un secret `RELEASE_TOKEN` (token fine-grained con *Contents* e *Workflows* in
-> scrittura), in quel caso il tag va creato a mano:
-> `git tag -a vX.Y.Z -m "Release vX.Y.Z" <commit>` e `git push origin refs/tags/vX.Y.Z`.
+> **`RELEASE_TOKEN`:** GitHub non permette al `GITHUB_TOKEN` di pubblicare un tag su
+> un commit che modifica `.github/workflows/`, quindi il tag viene pubblicato con un
+> token fine-grained salvato come secret del repository `RELEASE_TOKEN`, con permessi
+> *Contents* e *Workflows* in scrittura sul solo repository. Se il secret manca, il
+> workflow si ferma prima di costruire qualsiasi cosa. Il token scade: quando succede,
+> rinnovalo e aggiorna il secret.
 
 > **Visibilità:** i pacchetti sono collegati a questo repository pubblico e ne
 > ereditano la visibilità, quindi sono pubblici fin dalla prima pubblicazione. Se un

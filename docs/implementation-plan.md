@@ -1,6 +1,6 @@
 # Hestia: piano di implementazione
 
-> Stato: **M0 rilasciato come v0.1.0** (21 novembre 2026); prossimo passo M1, con due attività di M0 ancora aperte (vedi «M0 → Da fare»). Decisioni aperte chiuse il 20 novembre 2026. Rispetto all'handoff: niente pulsanti di modalità nella scheda «Corrente climatizzatori». Specifica di design: [`docs/design/HANDOFF.md`](design/HANDOFF.md).
+> Stato: **M0 rilasciato come v0.1.0 e chiuso** (21 novembre 2026); prossimo passo M1. Decisioni aperte chiuse il 20 novembre 2026. Rispetto all'handoff: niente pulsanti di modalità nella scheda «Corrente climatizzatori». Specifica di design: [`docs/design/HANDOFF.md`](design/HANDOFF.md).
 
 ## Contesto
 
@@ -25,7 +25,7 @@ Il progetto è **pubblico**: deve adattarsi a configurazioni di HA molto diverse
 | Ordine dei lavori | Prima la UI su dati simulati, poi il backend reale, poi la procedura di configurazione, gli override e la previsione. |
 | Licenza | MIT. |
 | Lingua | Codice, commenti e documentazione per contributor in inglese; README in inglese e italiano. |
-| Nomi delle immagini | `ghcr.io/undermix96/hestia-backend` e `hestia-frontend`; il vecchio pacchetto `hestia` è deprecato. |
+| Nomi delle immagini | `ghcr.io/undermix96/hestia-backend` e `hestia-frontend`. |
 | Override temporanei | Solo sulla **fascia in corso**. Le fasce future si possono modificare solo in modo permanente (se l'adattatore lo supporta). |
 | Modalità climatizzatori | **Nessun pulsante di modalità** (Caldo/Freddo/Deumidifica/Spento) nella UI: la modalità la decide il sistema domotico. Hestia la legge e la mostra. |
 | Banda target nel termogramma | Con più impianti nella stessa stanza, **i caloriferi hanno la precedenza**. |
@@ -268,9 +268,9 @@ Hestia/
   - i pacchetti GHCR ereditano la visibilità pubblica del repository: nessun passo manuale;
   - TypeScript resta alla 6.0 finché typescript-eslint non supporta la 7; pytest ignora un solo avviso di deprecazione di Starlette su `httpx` (passaggio a `httpx2` da valutare).
 
-**Da fare**
-- [ ] Token per il tag di release: creare un token fine-grained con permessi *Contents* e *Workflows* in scrittura sul solo repo Hestia, salvarlo come secret `RELEASE_TOKEN` e usarlo nel job `release` di `docker-build.yml` (checkout e push del tag). Fino ad allora, se una release contiene modifiche ai workflow, il tag va creato a mano.
-- [ ] Segnare come deprecato il vecchio pacchetto GHCR `hestia` (impostazioni del pacchetto su GitHub).
+**Attività chiuse dopo il rilascio**
+- [x] Token per il tag di release: secret `RELEASE_TOKEN` (fine-grained, *Contents* e *Workflows* in scrittura sul solo repo Hestia) usato dal job `release` di `docker-build.yml`; il job `version` si ferma subito se il secret manca. Il token scade: va rinnovato e il secret aggiornato.
+- [x] Vecchio pacchetto GHCR `hestia`: non è mai stato pubblicato, quindi non c'è nulla da deprecare.
 
 ### M1: UI fedele ai mockup, guidata dalle capacità, su dati simulati (v0.2.0)
 
@@ -486,14 +486,13 @@ Hestia/
    - immagini `ghcr.io/<owner>/hestia-backend` e `hestia-frontend`;
    - solo i tag immutabili: vX.Y.Z, X.Y.Z, sha.
 4. `promote`: sposta X.Y e latest di entrambe le immagini, solo dopo che entrambe le build sono riuscite.
-5. `release`: crea il tag git dopo `promote`. Richiede un token con permesso `workflows` (secret `RELEASE_TOKEN`, da fare: vedi R19).
+5. `release`: crea il tag git dopo `promote`. Usa il secret `RELEASE_TOKEN`, che ha il permesso `workflows` (vedi R19); il job `version` controlla subito che il secret esista.
 6. `verify`: pull anonimo di entrambi i pacchetti, controllando amd64 e arm64.
 
 **Ottimizzazioni e note**
 - Frontend: lo stage Node usa `--platform=$BUILDPLATFORM`, perché l'output statico è uguale per tutte le architetture.
 - Backend: `python:3.12-slim` con uv e wheel di numpy per arm64, senza scipy.
 - I pacchetti ereditano la visibilità (pubblica) del repository: nessun passo manuale alla prima release.
-- Il vecchio pacchetto `hestia` va segnato come deprecato (da fare).
 
 ## 8. docker-compose e nginx
 
@@ -576,7 +575,7 @@ Hestia/
 - **R16. Build arm64 sotto QEMU:** mitigazioni in §7.
 - **R17. Versione minima di HA** (`schedule.get_schedule`, `weather.get_forecasts`, `data` nei blocchi): fissarla in M2. Ogni adattatore dichiara la propria in `resolve_capabilities()`.
 - **R18. Decisioni di progetto:** tutte prese (licenza MIT, lingua, nomi delle immagini, precedenza dei caloriferi): vedi «Decisioni prese».
-- **R19. Tag di release con il `GITHUB_TOKEN`.** GitHub rifiuta il push di un tag su un commit che modifica `.github/workflows/` senza permesso `workflows`, che il `GITHUB_TOKEN` non può avere (successo in v0.1.0). Mitigazione: secret `RELEASE_TOKEN` (token fine-grained con *Contents* e *Workflows* in scrittura) nel job `release`. Da fare.
+- **R19. Tag di release con il `GITHUB_TOKEN`.** GitHub rifiuta il push di un tag su un commit che modifica `.github/workflows/` senza permesso `workflows`, che il `GITHUB_TOKEN` non può avere (successo in v0.1.0). Mitigazione: secret `RELEASE_TOKEN` (token fine-grained con *Contents* e *Workflows* in scrittura) nel job `release`. Applicata dopo v0.1.0.
 
 ## File di riferimento
 
