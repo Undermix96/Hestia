@@ -16,7 +16,7 @@ adatta a ciò che ogni adattatore supporta. Vedi
 
 ## Stato
 
-**Pre-alpha — milestone M0** (scheletro, CI e licenza). Le immagini si costruiscono
+**Pre-alpha — M0 rilasciato come `v0.1.0`** (scheletro, CI e licenza); prossimo passo M1. Le immagini si costruiscono
 e si avviano, ma per ora la dashboard mostra solo la propria versione: non c'è
 ancora nulla di utile da installare. La tabella di marcia è in
 [docs/implementation-plan.md](docs/implementation-plan.md) §5.
@@ -83,7 +83,14 @@ Ogni esecuzione:
 4. sposta `X.Y` e `latest` di entrambe le immagini sulla nuova release, solo dopo
    che entrambe le build sono riuscite, così i tag condivisi coincidono sempre;
 5. crea e pubblica il tag git `vX.Y.Z`, solo dopo che entrambe le build sono riuscite;
+   vedi la nota sotto per le release che modificano i workflow;
 6. verifica che entrambe le immagini si scarichino senza login per le due architetture.
+
+> **Tag git e file dei workflow:** GitHub non permette al `GITHUB_TOKEN` di pubblicare
+> un tag su un commit che modifica `.github/workflows/`. Finché il job `release` non usa
+> un secret `RELEASE_TOKEN` (token fine-grained con *Contents* e *Workflows* in
+> scrittura), in quel caso il tag va creato a mano:
+> `git tag -a vX.Y.Z -m "Release vX.Y.Z" <commit>` e `git push origin refs/tags/vX.Y.Z`.
 
 > **Visibilità:** i pacchetti sono collegati a questo repository pubblico e ne
 > ereditano la visibilità, quindi sono pubblici fin dalla prima pubblicazione. Se un

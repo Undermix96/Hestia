@@ -1,6 +1,6 @@
 # Hestia: piano di implementazione
 
-> Stato: **bozza in revisione**, decisioni aperte chiuse (20 novembre 2026). Rispetto all'handoff: niente pulsanti di modalità nella scheda «Corrente climatizzatori». Specifica di design: [`docs/design/HANDOFF.md`](design/HANDOFF.md).
+> Stato: **M0 rilasciato come v0.1.0** (21 novembre 2026); prossimo passo M1, con due attività di M0 ancora aperte (vedi «M0 → Da fare»). Decisioni aperte chiuse il 20 novembre 2026. Rispetto all'handoff: niente pulsanti di modalità nella scheda «Corrente climatizzatori». Specifica di design: [`docs/design/HANDOFF.md`](design/HANDOFF.md).
 
 ## Contesto
 
@@ -240,7 +240,7 @@ Hestia/
 
 ## 5. Milestone
 
-### M0: scheletro, CI e licenza (v0.1.0)
+### M0: scheletro, CI e licenza (v0.1.0) — rilasciato
 
 **Contenuto**
 - Struttura delle cartelle.
@@ -255,6 +255,22 @@ Hestia/
 - `docker buildx imagetools inspect` mostra manifest amd64 e arm64 per entrambe le immagini.
 - Il pull anonimo funziona per entrambi i pacchetti.
 - `compose up` risponde su `/api/health` passando da nginx. L'arm64 si verifica solo tramite build e manifest (nessuna macchina arm64 per i test).
+
+**Esito (21 novembre 2026)**
+- PR #1 unita in `main`; release `v0.1.0` pubblicata: immagini amd64 + arm64 per entrambi i pacchetti, scaricabili senza login, tag git `v0.1.0` su `84b020c`.
+- Il job `release` del workflow è fallito: GitHub rifiuta il push del tag con il `GITHUB_TOKEN` perché il commit modifica file in `.github/workflows/` (manca il permesso `workflows`, che il `GITHUB_TOKEN` non può avere). Il tag è stato creato a mano e il controllo del pull anonimo fatto a mano. Vedi R19.
+- In locale: tutti i comandi della CI, build arm64 sotto QEMU e test con `compose up` passando da nginx sono riusciti.
+- Scelte emerse durante l'implementazione:
+  - la variabile del tag immagine in compose è `HESTIA_TAG`, non `HESTIA_VERSION`: quest'ultima la imposta solo l'immagine e la legge `/api/version` (con lo stesso nome, un valore nel `.env` avrebbe sovrascritto la versione riportata);
+  - `latest` e `X.Y` vengono spostati da un job separato (`promote`) solo dopo che entrambe le build sono riuscite;
+  - nginx invia `X-Forwarded-For: $remote_addr`, così un client non può falsificare l'IP visto dal backend;
+  - `ci.yml` gira sulle PR e sui push a `main` soltanto, per non eseguire i test due volte;
+  - i pacchetti GHCR ereditano la visibilità pubblica del repository: nessun passo manuale;
+  - TypeScript resta alla 6.0 finché typescript-eslint non supporta la 7; pytest ignora un solo avviso di deprecazione di Starlette su `httpx` (passaggio a `httpx2` da valutare).
+
+**Da fare**
+- [ ] Token per il tag di release: creare un token fine-grained con permessi *Contents* e *Workflows* in scrittura sul solo repo Hestia, salvarlo come secret `RELEASE_TOKEN` e usarlo nel job `release` di `docker-build.yml` (checkout e push del tag). Fino ad allora, se una release contiene modifiche ai workflow, il tag va creato a mano.
+- [ ] Segnare come deprecato il vecchio pacchetto GHCR `hestia` (impostazioni del pacchetto su GitHub).
 
 ### M1: UI fedele ai mockup, guidata dalle capacità, su dati simulati (v0.2.0)
 
@@ -458,7 +474,7 @@ Hestia/
 - `tests.yml` (riusabile, `workflow_call`):
   - backend: ruff, mypy, import-linter, pytest (core, contratti di tutti gli adattatori, API), con service container `influxdb:2`;
   - frontend: eslint, tsc, vitest, controllo dei tipi generati rispetto a `openapi.json`, Playwright sugli scenari mock.
-- `ci.yml`: su push e PR richiama `tests.yml`.
+- `ci.yml`: sulle PR e sui push a `main` richiama `tests.yml` (i branch si testano tramite la loro PR).
 - `docker-build.yml`: avvio manuale, solo da `main`.
 
 **Job di `docker-build.yml`**
@@ -468,15 +484,16 @@ Hestia/
    - `platforms: linux/amd64,linux/arm64`;
    - cache gha separata per componente;
    - immagini `ghcr.io/<owner>/hestia-backend` e `hestia-frontend`;
-   - stessi tag di oggi: vX.Y.Z, X.Y.Z, X.Y, sha, latest.
-4. `release`: crea il tag git solo dopo che entrambe le build sono riuscite.
-5. `verify`: pull anonimo di entrambi i pacchetti.
+   - solo i tag immutabili: vX.Y.Z, X.Y.Z, sha.
+4. `promote`: sposta X.Y e latest di entrambe le immagini, solo dopo che entrambe le build sono riuscite.
+5. `release`: crea il tag git dopo `promote`. Richiede un token con permesso `workflows` (secret `RELEASE_TOKEN`, da fare: vedi R19).
+6. `verify`: pull anonimo di entrambi i pacchetti, controllando amd64 e arm64.
 
 **Ottimizzazioni e note**
 - Frontend: lo stage Node usa `--platform=$BUILDPLATFORM`, perché l'output statico è uguale per tutte le architetture.
 - Backend: `python:3.12-slim` con uv e wheel di numpy per arm64, senza scipy.
 - I pacchetti ereditano la visibilità (pubblica) del repository: nessun passo manuale alla prima release.
-- Il vecchio pacchetto `hestia` va segnato come deprecato.
+- Il vecchio pacchetto `hestia` va segnato come deprecato (da fare).
 
 ## 8. docker-compose e nginx
 
@@ -486,14 +503,15 @@ Hestia/
   - `env_file: .env` (`HA_URL`, `HA_TOKEN` e `INFLUX_*`, tutti facoltativi);
   - healthcheck;
   - nessuna porta pubblicata.
+  - immagine `hestia-backend:${HESTIA_TAG:-latest}`; `HESTIA_VERSION` è riservata all'immagine.
 - **frontend:**
-  - `BACKEND_URL=http://backend:8000`;
-  - porta 8080;
+  - `BACKEND_URL=http://backend:8000` (nome DNS o IP visti dal container, non `localhost`);
+  - porta `${HESTIA_PORT:-8080}`;
   - `depends_on` con `service_healthy`.
 
 **nginx** (immagine `nginx-unprivileged`)
 - Serve i file statici, con fallback della SPA e cache lunga sugli asset con hash.
-- Inoltra `/api/` al backend.
+- Inoltra `/api/` al backend, con `X-Forwarded-For: $remote_addr` (niente IP falsificati dal client).
 - Per `/api/live`: `proxy_buffering off`, `proxy_read_timeout 1h`, HTTP/1.1. Il backend invia comunque `X-Accel-Buffering: no`.
 - Essendo l'unico punto d'ingresso, non serve CORS.
 
@@ -558,6 +576,7 @@ Hestia/
 - **R16. Build arm64 sotto QEMU:** mitigazioni in §7.
 - **R17. Versione minima di HA** (`schedule.get_schedule`, `weather.get_forecasts`, `data` nei blocchi): fissarla in M2. Ogni adattatore dichiara la propria in `resolve_capabilities()`.
 - **R18. Decisioni di progetto:** tutte prese (licenza MIT, lingua, nomi delle immagini, precedenza dei caloriferi): vedi «Decisioni prese».
+- **R19. Tag di release con il `GITHUB_TOKEN`.** GitHub rifiuta il push di un tag su un commit che modifica `.github/workflows/` senza permesso `workflows`, che il `GITHUB_TOKEN` non può avere (successo in v0.1.0). Mitigazione: secret `RELEASE_TOKEN` (token fine-grained con *Contents* e *Workflows* in scrittura) nel job `release`. Da fare.
 
 ## File di riferimento
 

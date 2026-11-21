@@ -15,7 +15,7 @@ adapter supports. See [docs/architecture.md](docs/architecture.md).
 
 ## Status
 
-**Pre-alpha — milestone M0** (skeleton, CI and license). The images build and run,
+**Pre-alpha — M0 released as `v0.1.0`** (skeleton, CI and license); next is M1. The images build and run,
 but the dashboard only shows its version for now: there is nothing useful to
 install yet. The roadmap is in
 [docs/implementation-plan.md](docs/implementation-plan.md) §5.
@@ -80,7 +80,14 @@ Each run:
 4. moves `X.Y` and `latest` of both images to the new release, only after both
    builds succeeded, so the shared tags always match across the two images;
 5. creates and pushes the git tag `vX.Y.Z`, only after both builds succeeded;
+   see the note below on releases that change workflow files;
 6. checks that both images can be pulled anonymously for both architectures.
+
+> **Git tag and workflow files:** GitHub refuses to let the default `GITHUB_TOKEN`
+> push a tag onto a commit that changes `.github/workflows/`. Until a `RELEASE_TOKEN`
+> secret (fine-grained token with *Contents* and *Workflows* write access) is wired
+> into the `release` job, create the tag by hand in that case:
+> `git tag -a vX.Y.Z -m "Release vX.Y.Z" <commit>` and `git push origin refs/tags/vX.Y.Z`.
 
 > **Visibility:** the packages are linked to this public repository and inherit its
 > visibility, so they are public from the first publish. If a package ever ends up
