@@ -1,0 +1,810 @@
+/* Stanza screen (mockup N-Stanza.dc.html; inline styles = exact values). */
+
+/* ---------- Room tabs ---------- */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tab {
+  min-height: 58px;
+  padding: 8px 16px;
+  border-radius: var(--radius-tab);
+  background: var(--c-panel);
+  color: var(--c-text);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3px;
+  text-align: left;
+  text-decoration: none;
+  transition:
+    background 0.25s,
+    color 0.25s,
+    transform 0.2s;
+}
+
+a.tab:hover {
+  color: var(--c-text);
+  transform: translateY(-2px);
+}
+
+.tab[aria-current='page'],
+a.tab[aria-current='page']:hover {
+  background: var(--c-light);
+  color: var(--c-on-light);
+}
+
+.tabTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.tabTemp {
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.tabStatus {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tabSensorless {
+  border: 1px dashed var(--c-border-dashed);
+  background: transparent;
+  color: var(--c-text-2);
+  font-size: 15px;
+  font-weight: 700;
+  align-items: stretch;
+}
+
+.tabFollows {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--c-muted);
+}
+
+/* ---------- Summary ---------- */
+.summary {
+  max-width: 1040px;
+}
+
+.summaryText {
+  margin: 0;
+  font-size: 40px;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  font-weight: 300;
+}
+
+.summaryLead {
+  font-weight: 700;
+}
+
+.summaryConditions {
+  margin: 12px 0 0;
+  font-size: 15px;
+  color: var(--c-text-2);
+}
+
+/* ---------- Panels ---------- */
+.panel {
+  background: var(--c-panel);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+}
+
+.thermoPanel {
+  padding: 22px 22px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  --label-col: 118px;
+  --plot-offset: 130px;
+}
+
+.topBar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--c-text-2);
+}
+
+.topRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--c-muted);
+}
+
+.body {
+  display: flex;
+  gap: 12px;
+}
+
+/* ---------- Labels column ---------- */
+.labels {
+  width: var(--label-col);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.labelsRoom {
+  position: relative;
+  height: 260px;
+  font-size: 10px;
+  color: var(--c-muted);
+}
+
+.labelsTitle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-text);
+}
+
+.labelsTick {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+}
+
+.spacer {
+  height: 10px;
+  flex: none;
+}
+
+.laneLabel {
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.laneName {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.laneActing {
+  height: 14px;
+  display: flex;
+  align-items: center;
+  color: var(--c-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.labelsOutdoor {
+  position: relative;
+  height: 80px;
+  font-size: 10px;
+  color: var(--c-muted);
+}
+
+.outdoorMax {
+  position: absolute;
+  right: 0;
+  top: 8%;
+}
+
+.outdoorMin {
+  position: absolute;
+  right: 0;
+  bottom: 6%;
+}
+
+/* ---------- Plot ---------- */
+.plot {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  margin-right: 34px;
+}
+
+.roomChart {
+  position: relative;
+  height: 260px;
+}
+
+.gridline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--c-grid);
+}
+
+.chartSvg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+.humArea {
+  fill: var(--c-hum-area);
+}
+
+.humLine {
+  fill: none;
+  stroke: var(--c-hum);
+  stroke-width: 1.4;
+  stroke-opacity: 0.8;
+}
+
+.band {
+  fill: var(--c-band);
+}
+
+.target {
+  fill: none;
+  stroke: var(--c-target);
+  stroke-width: 1.8;
+  stroke-dasharray: 5 4;
+}
+
+.past {
+  fill: none;
+  stroke: var(--c-text);
+  stroke-width: 2.8;
+  stroke-linejoin: round;
+}
+
+.forecastLine {
+  fill: none;
+  stroke: var(--c-text);
+  stroke-width: 2.8;
+  stroke-dasharray: 1 6;
+  stroke-linecap: round;
+}
+
+.humLabel {
+  position: absolute;
+  right: -6px;
+  transform: translateX(100%);
+  font-size: 10px;
+  color: var(--c-hum);
+}
+
+.humLabelTop {
+  top: 0;
+}
+
+.humLabelBottom {
+  bottom: 0;
+}
+
+.outdoorChart {
+  position: relative;
+  height: 80px;
+  background: var(--c-out-bg);
+  border-radius: 8px;
+}
+
+.outdoorSvg {
+  position: absolute;
+  inset: 0;
+}
+
+.outHumArea {
+  fill: var(--c-out-hum-area);
+}
+
+.outHum {
+  fill: none;
+  stroke: var(--c-out-hum);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 3;
+}
+
+.outTemp {
+  fill: none;
+  stroke: var(--c-out);
+  stroke-width: 2.2;
+}
+
+/* ---------- Cursor ---------- */
+.slider {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 260px;
+  border-radius: 10px;
+  background: transparent;
+  z-index: 2;
+}
+
+.cursorLine {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 1px;
+  background: var(--c-text);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.cursorDot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--c-text);
+  border: 3px solid var(--c-panel);
+  pointer-events: none;
+}
+
+.tooltip {
+  position: absolute;
+  top: 6px;
+  background: var(--c-panel);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-tooltip);
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.65;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: var(--shadow-tooltip);
+  min-width: 230px;
+  z-index: 5;
+}
+
+.tooltipWhen {
+  font-size: 11px;
+  color: var(--c-muted);
+  margin-bottom: 4px;
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.tooltipMuted {
+  color: var(--c-muted);
+}
+
+.tooltipIndent {
+  padding-left: 10px;
+}
+
+.tooltipOutdoor {
+  color: var(--c-out);
+}
+
+/* ---------- Axis and bottom legend ---------- */
+.axisRow {
+  margin: 0 34px 0 var(--plot-offset);
+}
+
+.bottomLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-left: var(--plot-offset);
+  font-size: 12px;
+  color: var(--c-text-2);
+}
+
+.legendNote {
+  margin-left: auto;
+}
+
+/* ---------- Slot editor ---------- */
+.editor {
+  margin-left: var(--plot-offset);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  background: var(--c-light);
+  color: var(--c-on-light);
+  border-radius: var(--radius-editor);
+  padding: 14px 16px;
+}
+
+.editorText {
+  flex: 1;
+  min-width: 220px;
+}
+
+.editorTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.editorNote {
+  font-size: 12px;
+  color: var(--c-on-light-muted);
+}
+
+.editorError {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-on-light);
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--c-light-track);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+}
+
+.scopes {
+  gap: 4px;
+}
+
+.scope {
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--c-on-light);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.25s,
+    color 0.25s;
+}
+
+.scope[aria-checked='true'] {
+  background: var(--c-on-light);
+  color: var(--c-light);
+}
+
+.stepButton {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 50%;
+  border: 0;
+  background: var(--c-light-btn);
+  color: var(--c-on-light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.15s,
+    background 0.2s;
+}
+
+.stepButton:hover:not(:disabled) {
+  background: var(--c-light-btn-hover);
+}
+
+.stepButton:active:not(:disabled) {
+  transform: scale(0.9);
+}
+
+.stepButton:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.stepValue {
+  width: 64px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.timeGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-on-light-muted);
+  padding-left: 8px;
+}
+
+.timeValue {
+  width: 58px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.reset {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--c-light-border);
+  background: transparent;
+  color: var(--c-on-light);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.reset:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.done {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  border: 0;
+  background: var(--c-on-light);
+  color: var(--c-light);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.editor :focus-visible {
+  outline-color: var(--c-on-light);
+}
+
+/* ---------- Bottom row ---------- */
+.bottomRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-row);
+}
+
+.powerCard {
+  flex: 1 1 340px;
+  padding: var(--panel-pad);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.powerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.mutedLabel {
+  font-size: 12px;
+  color: var(--c-muted);
+}
+
+.powerNow {
+  font-size: 40px;
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.powerUnit {
+  font-size: 16px;
+  color: var(--c-muted);
+}
+
+.powerRight {
+  text-align: right;
+}
+
+.powerKwh {
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.powerCost {
+  font-size: 12px;
+  color: var(--c-text-2);
+}
+
+.powerMonth {
+  font-size: 13px;
+  color: var(--c-text-2);
+  border-top: 1px solid var(--c-grid);
+  padding-top: 12px;
+}
+
+.powerNone {
+  font-size: 13px;
+  color: var(--c-text-2);
+}
+
+.modeBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--c-grid);
+  padding-top: 12px;
+}
+
+.modeValue {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.weekCard {
+  flex: 2 1 560px;
+  padding: var(--panel-pad);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.weekHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.weekSources {
+  font-size: 12px;
+  color: var(--c-muted);
+  text-align: right;
+}
+
+.weekNoProgram {
+  margin: 0;
+  font-size: 12px;
+  color: var(--c-muted);
+}
+
+.weekList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.weekRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.weekDay {
+  width: 36px;
+  flex: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.weekToday {
+  font-weight: 800;
+}
+
+.weekBars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.weekFull {
+  position: relative;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--c-lane);
+  overflow: hidden;
+}
+
+.weekSlot {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-right: 1px solid var(--c-panel);
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff; /* mockup: white values on the radiator colours */
+  padding-left: 4px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.weekThin {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--c-lane);
+  overflow: hidden;
+}
+
+.weekThinSlot {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 4px;
+}
+
+.weekAxis {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 46px;
+  font-size: 10px;
+  color: var(--c-muted);
+}
+
+/* ---------- Skeleton ---------- */
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-blocks);
+}
+
+.skeletonTabs {
+  min-height: 58px;
+}
+
+.skeletonSummary {
+  min-height: 110px;
+}
+
+.skeletonThermo {
+  min-height: 560px;
+}
+
+.skeletonCard {
+  flex: 1 1 340px;
+  min-height: 300px;
+}
+
+.skeletonWeek {
+  flex: 2 1 560px;
+  min-height: 300px;
+}
+
+/* ---------- Narrow windows (tablet) ---------- */
+@media (max-width: 1279px) {
+  .thermoPanel {
+    --label-col: 96px;
+    --plot-offset: 108px;
+  }
+}

@@ -1,0 +1,262 @@
+/* Tutte le stanze (docs/design/mockup/N-Tutte.dc.html inline styles). */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 22px 16px;
+  border-radius: var(--radius-panel);
+  background: var(--c-panel);
+}
+
+.skeleton {
+  min-height: 760px;
+}
+
+/* Mockup: `.mono` letter-spacing −0.02em on this screen. */
+.panel :global(.mono) {
+  letter-spacing: -0.02em;
+}
+
+/* Top bar: compact legend | cursor readout + range selector */
+.topBar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--c-text-2);
+}
+
+.topRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.readout {
+  font-size: 12px;
+  color: var(--c-text-2);
+}
+
+/* Three aligned columns */
+.columns {
+  display: flex;
+  gap: 14px;
+}
+
+.left {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 230px;
+}
+
+.center {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  cursor: crosshair;
+}
+
+.right {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 170px;
+}
+
+/* Rows: the mockup has no border-box reset, so a row is 112px + its 1px top border. */
+.row {
+  box-sizing: content-box;
+  height: 112px;
+  border-top: 1px solid var(--c-grid);
+}
+
+.outdoorRow {
+  box-sizing: content-box;
+  height: 72px;
+  border-top: 1px solid var(--c-grid);
+}
+
+/* Left column */
+.roomRow {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 8px;
+  border-radius: 10px;
+  transition: background 0.25s;
+}
+
+.roomRow:hover {
+  background: var(--c-row-hover);
+}
+
+.roomHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.roomName {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.roomTemp {
+  font-size: 26px;
+  font-weight: 300;
+}
+
+.status {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text-2);
+}
+
+.open {
+  display: inline-flex;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--c-muted);
+  text-decoration: none;
+  transition:
+    color 0.2s,
+    gap 0.25s;
+}
+
+.open:hover,
+.open:focus-visible {
+  gap: 10px;
+  color: var(--c-target);
+}
+
+.outdoorLeft {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 8px;
+}
+
+.outdoorValue {
+  font-size: 12px;
+  color: var(--c-text-2);
+}
+
+/* Center column */
+.cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Three or more strips: a tighter gap keeps the cell within its 112px. */
+.cellDense {
+  gap: 3px;
+}
+
+.chart {
+  display: block;
+}
+
+.noSensor {
+  display: flex;
+  align-items: center;
+  height: 80px;
+  padding-left: 14px;
+  border-radius: 8px;
+  background: var(--pattern-nodata);
+  font-size: 13px;
+  color: var(--c-muted);
+}
+
+.strip {
+  position: relative;
+  height: 7px;
+  border-radius: var(--radius-act);
+  background: var(--c-lane);
+  overflow: hidden;
+}
+
+.stripRun {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.outdoorCenter {
+  display: flex;
+  align-items: center;
+}
+
+.cursorLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--c-text);
+  pointer-events: none;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+}
+
+.slider:focus-visible {
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+
+/* Right column */
+.values {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 3px;
+  text-align: right;
+}
+
+.valueTemp {
+  font-size: 22px;
+  font-weight: 300;
+}
+
+.valueTarget {
+  font-size: 11px;
+  color: var(--c-muted);
+}
+
+.valueAction {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.outdoorRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.outdoorCursor {
+  font-size: 14px;
+  color: var(--c-out);
+}
+
+/* Axis under the center column */
+.axis {
+  margin: 0 184px 0 244px;
+}

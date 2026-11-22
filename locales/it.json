@@ -202,6 +202,9 @@
   "clima.tutte.outdoorValue": "{temperature}° · {humidity}%",
   "clima.tutte.rowChartLabel": "{room}: {temperature}°, target {target}°, {status}",
   "clima.tutte.table.caption": "Valori di tutte le stanze all’ora del cursore",
+  "clima.tutte.table.time": "Ora: {when}",
+  "clima.tutte.table.room": "Stanza",
+  "clima.tutte.table.systems": "Impianti",
 
   "mock.room.soggiorno": "Soggiorno",
   "mock.room.corridoio": "Corridoio",
