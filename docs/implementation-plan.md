@@ -1,6 +1,6 @@
 # Hestia: piano di implementazione
 
-> Stato: **M1 completato, da rilasciare come v0.2.0** (22 novembre 2026); M0 rilasciato come v0.1.0 e chiuso (21 novembre 2026); prossimo passo M2. Decisioni aperte chiuse il 20 novembre 2026. Rispetto all'handoff: niente pulsanti di modalità nella scheda «Corrente climatizzatori». Specifica di design: [`docs/design/HANDOFF.md`](design/HANDOFF.md).
+> Stato: **M1 rilasciato come v0.2.0** (22 novembre 2026); M0 rilasciato come v0.1.0 e chiuso (21 novembre 2026); prossimo passo M2. Decisioni aperte chiuse il 20 novembre 2026. Rispetto all'handoff: niente pulsanti di modalità nella scheda «Corrente climatizzatori». Specifica di design: [`docs/design/HANDOFF.md`](design/HANDOFF.md).
 
 ## Contesto
 
@@ -272,7 +272,7 @@ Hestia/
 - [x] Token per il tag di release: secret `RELEASE_TOKEN` (fine-grained, *Contents* e *Workflows* in scrittura sul solo repo Hestia) usato dal job `release` di `docker-build.yml`; il job `version` si ferma subito se il secret manca. Il token scade: va rinnovato e il secret aggiornato.
 - [x] Vecchio pacchetto GHCR `hestia`: non è mai stato pubblicato, quindi non c'è nulla da deprecare.
 
-### M1: UI fedele ai mockup, guidata dalle capacità, su dati simulati (v0.2.0) — completato
+### M1: UI fedele ai mockup, guidata dalle capacità, su dati simulati (v0.2.0) — rilasciato
 
 **Contenuto**
 - Contratto generico (§1) in Pydantic, con i tipi TS generati.

@@ -16,7 +16,7 @@ adatta a ciò che ogni adattatore supporta. Vedi
 
 ## Stato
 
-**Pre-alpha — M1 completato, da rilasciare come `v0.2.0`** (M0, lo scheletro, è
+**Pre-alpha — M1 rilasciato come `v0.2.0`** (M0, lo scheletro, è
 uscito come `v0.1.0`). Le schermate «Stanza» e «Tutte le stanze» del modulo Clima
 sono pronte, ma funzionano su **dati simulati** (orologio fisso e alcune case di
 prova, scelte con `?scenario=`): Hestia non legge ancora Home Assistant, quindi non
