@@ -12,7 +12,7 @@ import {
   roomChartPaths,
   stepPath,
 } from '../../src/modules/clima/thermogram/paths';
-import { yRoomT } from '../../src/modules/clima/thermogram/scales';
+import { MINI_H, yMiniT, yRoomT } from '../../src/modules/clima/thermogram/scales';
 import { loadStanzaOracle, loadTutteOracle, ORACLE_ROOMS } from './oracle/loadMockup';
 
 const RANGES: [TimeRange, '24h' | '7g'][] = [
@@ -95,5 +95,30 @@ describe('path primitives', () => {
   it('room scale matches the mockup', () => {
     expect(yRoomT(14)).toBe(252);
     expect(yRoomT(25)).toBe(8);
+  });
+
+  it('row scale clamps values outside 15-24 °C to the row edges', () => {
+    expect(yMiniT(15)).toBe(76);
+    expect(yMiniT(24)).toBe(4);
+    expect(yMiniT(14)).toBe(76);
+    expect(yMiniT(30)).toBe(4);
+    expect(yMiniT(19.5)).toBe(40);
+  });
+});
+
+describe('Tutte row chart stays inside its row', () => {
+  const ys = (d: string) => [...d.matchAll(/[ML][\d.]+ ([\d.-]+)/g)].map((m) => Number(m[1]));
+
+  it.each(['24h', '7d'] as const)('noProgram corridoio (about 14 °C) %s', async (range) => {
+    const ov = await new MockDataSource('noProgram').getOverview({ range });
+    const row = ov.rows.find((r) => r.room.id === 'corridoio')!;
+    expect(Math.min(...row.climate!.measuredC.filter((v): v is number => v != null))).toBeLessThan(15);
+    const p = miniChartPaths(row.climate!, row.target!, ov.grid.nowIndex);
+    const all = [...ys(p.past), ...ys(p.forecast), ...ys(p.target), ...ys(p.band)];
+    expect(all.length).toBeGreaterThan(0);
+    for (const y of all) {
+      expect(y).toBeGreaterThanOrEqual(0);
+      expect(y).toBeLessThanOrEqual(MINI_H);
+    }
   });
 });

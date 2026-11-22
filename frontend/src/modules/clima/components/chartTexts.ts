@@ -6,6 +6,16 @@ import { cursorPhase } from '../logic/cursor';
 import { axisTicks } from '../thermogram/axis';
 import type { AxisTickLabel } from './AxisLabels';
 
+/** Temperature number "21,8" (no unit: the message adds it), or the missing-value mark. */
+export function temperatureOrMissing(v: number | null | undefined): string {
+  return v == null ? t('common.missingValue') : fmt.temp(v);
+}
+
+/** Percentage number "47" (no unit), or the missing-value mark. */
+export function percentOrMissing(v: number | null | undefined): string {
+  return v == null ? t('common.missingValue') : fmt.pct(v);
+}
+
 /** "21,8°", or the missing-value mark. */
 export function degrees(v: number | null | undefined): string {
   return v == null ? t('common.missingValue') : t('clima.axis.degrees', { value: fmt.temp(v) });

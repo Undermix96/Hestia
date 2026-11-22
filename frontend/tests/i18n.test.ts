@@ -130,7 +130,7 @@ describe('fmt', () => {
   });
 
   it('slotTime', () => {
-    expect(fmt.slotTime('24:00')).toBe('00:00');
+    expect(fmt.slotTime('24:00')).toBe('24:00');
     expect(fmt.slotTime('06:30')).toBe('06:30');
   });
 

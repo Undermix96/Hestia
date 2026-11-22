@@ -4,6 +4,7 @@ import { t } from '../../../i18n';
 import { fmt } from '../../../i18n/format';
 import { MOTION } from '../../../styles/motion';
 import { editorAvailability, type EditorAvailability } from '../logic/editorOptions';
+import { onFillTextColor } from '../logic/colors';
 import { boxPct } from '../logic/runs';
 import { systemName } from '../names';
 import { kindSpec } from '../systemKinds';
@@ -44,10 +45,12 @@ export function ProgramBar({ lane, capabilities, count, range, selectedKey, edit
         const classes = [styles.segment, MOTION.grow];
         if (selected) classes.push(styles.selected);
         else if (seg.edited) classes.push(styles.edited);
+        const fill = spec.programFill(seg);
         const style = {
           left: `${box.left.toFixed(3)}%`,
           width: `${box.width.toFixed(3)}%`,
-          background: spec.programFill(seg),
+          background: fill,
+          color: onFillTextColor(fill),
         };
         const availability = editorAvailability(seg, capabilities, lane.representation);
         if (!availability.clickable) {

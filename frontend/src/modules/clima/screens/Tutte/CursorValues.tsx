@@ -2,7 +2,7 @@ import type { OverviewRow } from '../../../../api/types';
 import { t } from '../../../../i18n';
 import { fmt } from '../../../../i18n/format';
 import { degrees } from '../../components/chartTexts';
-import { actionDotColor } from '../../logic/colors';
+import { actionTextColor } from '../../logic/colors';
 import { sampleAt } from '../../thermogram/samples';
 import { actionAt, systemActionText } from './tutteModel';
 import styles from './Tutte.module.css';
@@ -26,7 +26,9 @@ export function CursorValues({ row, index }: { row: OverviewRow; index: number }
             <span
               key={system.systemId}
               className={styles.valueAction}
-              style={{ color: actionDotColor(actionAt(system, index)) }}
+              // Text colour, not the dot colour: the idle/off grey of the dots is below 4.5:1 on the panel
+              // (WCAG 1.4.3); the action is also spelled out, so the state never rests on colour alone.
+              style={{ color: actionTextColor(actionAt(system, index)) }}
             >
               {systemActionText(system, index)}
             </span>

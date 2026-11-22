@@ -3,6 +3,7 @@ import type { RoomTimeline } from '../../../../api/types';
 import { intlLocale, t } from '../../../../i18n';
 import { fmt } from '../../../../i18n/format';
 import { enterClass } from '../../../../styles/motion';
+import { onFillTextColor } from '../../logic/colors';
 import { weekRows } from '../../logic/weekProgram';
 import { roomName, systemLowerName, systemName } from '../../names';
 import { sortByLaneOrder } from '../../systemKinds';
@@ -62,6 +63,7 @@ export function WeekProgram({ tl }: { tl: RoomTimeline }) {
                               left: `${slot.leftPct.toFixed(2)}%`,
                               width: `${slot.widthPct.toFixed(2)}%`,
                               background: slot.fill,
+                              color: onFillTextColor(slot.fill),
                             }}
                           >
                             {slot.showValue && slot.valueC != null ? fmt.temp(slot.valueC) : null}
@@ -78,6 +80,7 @@ export function WeekProgram({ tl }: { tl: RoomTimeline }) {
                               left: `${slot.leftPct.toFixed(2)}%`,
                               width: `${slot.widthPct.toFixed(2)}%`,
                               background: slot.fill,
+                              color: onFillTextColor(slot.fill),
                             }}
                           />
                         ))}

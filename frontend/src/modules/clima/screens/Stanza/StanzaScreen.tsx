@@ -114,7 +114,12 @@ export function StanzaScreen() {
   // While another room loads, the previous one stays on screen so the charts can morph.
   const shown = timeline.data;
   if (timeline.status === 'error' && (shown === null || draft === null)) {
-    return <ErrorView error={timeline.error} onRetry={timeline.reload} />;
+    return (
+      <>
+        <h1 className="visually-hidden">{t('module.clima.stanza')}</h1>
+        <ErrorView error={timeline.error} onRetry={timeline.reload} />
+      </>
+    );
   }
   if (shown === null || !shown.room.hasSensor) return <StanzaSkeleton />;
   return <StanzaContent tl={shown} previewError={timeline.status === 'error'} />;

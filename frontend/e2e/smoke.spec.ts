@@ -1,7 +1,7 @@
-import { expect, test, type Page } from '@playwright/test';
-import it from '../../locales/it.json' with { type: 'json' };
+import { expect, it, test } from './fixtures';
 
 // M1 runs on the mock data source: no backend and no /api calls are needed.
+// Every test fails on console errors (fixtures.ts).
 
 test('/ opens the first room and shows the app shell', async ({ page }) => {
   await page.goto('/');
@@ -66,32 +66,9 @@ test('the range is shared by Stanza and Tutte', async ({ page }) => {
   await expect(range().getByRole('button', { name: it['clima.range.24h'] })).toHaveAttribute('aria-pressed', 'true');
 });
 
-const SCENARIOS = ['home', 'perSlot', 'readonly', 'noProgram', 'manyRooms'] as const;
-
-/** Fails the test on any console error or uncaught page error. */
-function collectErrors(page: Page): string[] {
-  const errors: string[] = [];
-  page.on('console', (msg) => {
-    if (msg.type() === 'error') errors.push(msg.text());
-  });
-  page.on('pageerror', (err) => errors.push(err.message));
-  return errors;
-}
-
-for (const scenario of SCENARIOS) {
-  test(`scenario ${scenario} boots both clima screens without errors`, async ({ page }) => {
-    const errors = collectErrors(page);
-    await page.goto(`/clima/stanza?scenario=${scenario}`);
-    await expect(page).toHaveURL((url) => url.pathname === '/clima/stanza/soggiorno' && url.search === `?scenario=${scenario}`);
-    await expect(page.getByRole('main')).toBeVisible();
-    await page.goto(`/clima/tutte?scenario=${scenario}`);
-    await expect(page.getByRole('main')).toBeVisible();
-    expect(errors).toEqual([]);
-  });
-}
+// Each scenario's boot is covered by scenarios.spec.ts.
 
 test('an unknown scenario falls back to home with a warning', async ({ page }) => {
-  const errors = collectErrors(page);
   const warnings: string[] = [];
   page.on('console', (msg) => {
     if (msg.type() === 'warning') warnings.push(msg.text());
@@ -99,19 +76,23 @@ test('an unknown scenario falls back to home with a warning', async ({ page }) =
   await page.goto('/?scenario=nope');
   await expect(page).toHaveURL(/\/clima\/stanza\/soggiorno\?scenario=nope$/);
   expect(warnings.some((w) => w.includes('Unknown scenario "nope"'))).toBe(true);
-  expect(errors).toEqual([]);
 });
 
-test('?source=http without a data source shows the error view', async ({ page }) => {
-  await page.route('**/api/**', (route) =>
-    route.fulfill({
-      status: 503,
-      contentType: 'application/json',
-      body: JSON.stringify({ code: 'no_data_source', message: 'No data source configured.' }),
-    }),
-  );
-  await page.goto('/?source=http');
-  const alert = page.getByRole('alert');
-  await expect(alert).toContainText(it['error.no_data_source']);
-  await expect(alert.getByRole('button', { name: it['error.retry'] })).toBeVisible();
+test.describe('without a data source', () => {
+  // Chromium logs the mocked 503 responses as console errors: they are the point of this test.
+  test.use({ allowedConsoleErrors: [/status of 503/] });
+
+  test('?source=http shows the error view', async ({ page }) => {
+    await page.route('**/api/**', (route) =>
+      route.fulfill({
+        status: 503,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 'no_data_source', message: 'No data source configured.' }),
+      }),
+    );
+    await page.goto('/?source=http');
+    const alert = page.getByRole('alert');
+    await expect(alert).toContainText(it['error.no_data_source']);
+    await expect(alert.getByRole('button', { name: it['error.retry'] })).toBeVisible();
+  });
 });

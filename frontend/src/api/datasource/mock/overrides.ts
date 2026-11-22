@@ -4,7 +4,8 @@ import type { Override, OverrideChange, OverrideCreate, Program, Slot, Weekday }
 import { WEEKDAYS } from '../../types';
 import { hhmmToMinutes, minutesToHhmm } from '../../../lib/time';
 import type { MockGrid } from './neng/grid';
-import { isFullCoverage, slotTarget } from './programs';
+import { isFullCoverage } from '../../../lib/program';
+import { slotTarget } from './programs';
 import type { MockSystemDef } from './scenarios/types';
 
 export interface StoredChange {

@@ -16,10 +16,12 @@ adatta a ciò che ogni adattatore supporta. Vedi
 
 ## Stato
 
-**Pre-alpha — M0 rilasciato come `v0.1.0`** (scheletro, CI e licenza); prossimo passo M1. Le immagini si costruiscono
-e si avviano, ma per ora la dashboard mostra solo la propria versione: non c'è
-ancora nulla di utile da installare. La tabella di marcia è in
-[docs/implementation-plan.md](docs/implementation-plan.md) §5.
+**Pre-alpha — M1 completato, da rilasciare come `v0.2.0`** (M0, lo scheletro, è
+uscito come `v0.1.0`). Le schermate «Stanza» e «Tutte le stanze» del modulo Clima
+sono pronte, ma funzionano su **dati simulati** (orologio fisso e alcune case di
+prova, scelte con `?scenario=`): Hestia non legge ancora Home Assistant, quindi non
+c'è ancora nulla di utile da installare. I dati reali arrivano con M2. La tabella
+di marcia è in [docs/implementation-plan.md](docs/implementation-plan.md) §5.
 
 ## Avvio rapido
 

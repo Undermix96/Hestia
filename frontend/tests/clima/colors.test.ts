@@ -3,9 +3,11 @@ import {
   actionDotColor,
   actionFill,
   actionTextColor,
+  contrastRatio,
   IDLE_PATTERN,
   isActive,
   mix,
+  onFillTextColor,
   PALETTE,
   radiatorColor,
 } from '../../src/modules/clima/logic/colors';
@@ -64,5 +66,28 @@ describe('action colours', () => {
       false,
       false,
     ]);
+  });
+});
+
+describe('labels on program fills (WCAG 1.4.3)', () => {
+  it('computes WCAG contrast ratios', () => {
+    expect(contrastRatio('#FFFFFF', '#000000')).toBeCloseTo(21, 5);
+    expect(contrastRatio('#FFFFFF', PALETTE.radHi)).toBeCloseTo(4.13, 2);
+    expect(contrastRatio('rgb(255,255,255)', '#FFFFFF')).toBe(1);
+  });
+
+  it('keeps white where it reaches 4.5:1 and switches to the ink otherwise', () => {
+    expect(onFillTextColor(radiatorColor(17))).toBe(PALETTE.onFill);
+    expect(onFillTextColor(radiatorColor(22))).toBe(PALETTE.onFill);
+    expect(onFillTextColor(radiatorColor(23))).toBe(PALETTE.onFillInk);
+    expect(onFillTextColor(PALETTE.acProg)).toBe(PALETTE.onFill);
+    expect(onFillTextColor('transparent')).toBe(PALETTE.onFill);
+  });
+
+  it('every radiator value from 15 to 26 °C gets a label colour with at least 4.5:1', () => {
+    for (let v = 15; v <= 26; v += 0.1) {
+      const fill = radiatorColor(v);
+      expect(contrastRatio(onFillTextColor(fill), fill)).toBeGreaterThanOrEqual(4.5);
+    }
   });
 });

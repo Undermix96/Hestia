@@ -8,18 +8,17 @@ import {
   localToEpoch,
   minuteOfDay,
   minutesToHhmm,
-  parseIso,
 } from '../../src/lib/time';
 
 const TZ = 'Europe/Rome';
 
 describe('time helpers', () => {
   it('localParts in Rome', () => {
-    const p = localParts(parseIso('2026-11-20T08:30:00+01:00'), TZ);
+    const p = localParts(Date.parse('2026-11-20T08:30:00+01:00'), TZ);
     expect(p).toEqual({ year: 2026, month: 11, day: 20, hour: 8, minute: 30, weekday: 'fri' });
     expect(hourOfDay(p)).toBe(8.5);
     expect(minuteOfDay(p)).toBe(510);
-    expect(localParts(parseIso('2026-11-19T23:30:00Z'), TZ).weekday).toBe('fri');
+    expect(localParts(Date.parse('2026-11-19T23:30:00Z'), TZ).weekday).toBe('fri');
   });
 
   it('isoWithOffset uses the zone offset of the instant (winter +01:00, summer +02:00)', () => {
@@ -35,8 +34,8 @@ describe('time helpers', () => {
   });
 
   it('localDayIndex counts local dates', () => {
-    const a = localDayIndex(localParts(parseIso('2026-11-20T00:10:00+01:00'), TZ));
-    const b = localDayIndex(localParts(parseIso('2026-11-19T23:50:00+01:00'), TZ));
+    const a = localDayIndex(localParts(Date.parse('2026-11-20T00:10:00+01:00'), TZ));
+    const b = localDayIndex(localParts(Date.parse('2026-11-19T23:50:00+01:00'), TZ));
     expect(a - b).toBe(1);
   });
 

@@ -11,6 +11,7 @@ import type {
   Weekday,
 } from '../../../api/types';
 import { WEEKDAYS } from '../../../api/types';
+import { isFullCoverage } from '../../../lib/program';
 import { hhmmToMinutes, minutesToHhmm } from '../../../lib/time';
 import type { EditorOption } from '../types';
 
@@ -78,12 +79,6 @@ export interface TimeBounds {
   fixedTo: boolean;
 }
 
-function isFullCoverage(program: Program, day: Weekday): boolean {
-  const slots = program.days[day];
-  if (!slots.length || slots[0]!.from !== '00:00' || slots[slots.length - 1]!.to !== '24:00') return false;
-  return slots.every((s, i) => i === 0 || slots[i - 1]!.to === s.from);
-}
-
 /**
  * Bounds (minutes) of the times of a slot. Full-coverage days keep the first slot at 00:00 and the last at 24:00
  * and never swallow a neighbour; gap days never overlap one. `current` are the times being edited (default: the
@@ -104,7 +99,7 @@ export function timeBounds(
   const to = hhmmToMinutes(current?.to ?? slot.to);
   const prev = slots[i - 1];
   const next = slots[i + 1];
-  if (isFullCoverage(program, day)) {
+  if (isFullCoverage(program.days[day])) {
     const fixedFrom = i === 0;
     const fixedTo = i === slots.length - 1;
     return {

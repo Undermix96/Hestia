@@ -36,11 +36,15 @@
   --c-rad-lo: #3A5A8C;
   --c-rad-hi: #C2622E;
   --c-dot-idle: #6A767F;
+  /* Labels on program fills: white, or the ink where white is below 4.5:1 (logic/colors.ts onFillTextColor) */
+  --c-on-fill: #FFFFFF;
+  --c-on-fill-ink: #000000;
 
   /* Interaction */
   --c-nav-hover: #252D33;
   --c-row-hover: #171D21;
   --c-now-glow: rgba(255,138,76,.3);
+  --c-now-glow-end: rgba(255,138,76,0);
 
   /* Light surfaces (active tabs, editor) */
   --c-on-light: #151A1E;

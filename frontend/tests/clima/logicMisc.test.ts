@@ -48,14 +48,20 @@ describe('cursor', () => {
     expect(tooltipOnLeft(31, 52)).toBe(true);
   });
   it('keyboard steps', () => {
-    expect(keyboardStep('ArrowRight', '24h', false)).toBe(1);
-    expect(keyboardStep('ArrowLeft', '24h', true)).toBe(-2);
-    expect(keyboardStep('ArrowRight', '7d', true)).toBe(12);
-    expect(keyboardStep('PageUp', '24h', false)).toBe(-8);
-    expect(keyboardStep('PageDown', '7d', false)).toBe(48);
-    expect(keyboardStep('Home', '7d', false)).toBe('home');
-    expect(keyboardStep('End', '24h', false)).toBe('end');
-    expect(keyboardStep('a', '24h', false)).toBeNull();
+    const day = { range: '24h', stepMinutes: 30 } as const;
+    const week = { range: '7d', stepMinutes: 30 } as const;
+    expect(keyboardStep('ArrowRight', day, false)).toBe(1);
+    expect(keyboardStep('ArrowLeft', day, true)).toBe(-2);
+    expect(keyboardStep('ArrowRight', week, true)).toBe(12);
+    expect(keyboardStep('PageUp', day, false)).toBe(-8);
+    expect(keyboardStep('PageDown', week, false)).toBe(48);
+    expect(keyboardStep('Home', week, false)).toBe('home');
+    expect(keyboardStep('End', day, false)).toBe('end');
+    expect(keyboardStep('a', day, false)).toBeNull();
+    // The steps are hours, whatever the sampling interval.
+    expect(keyboardStep('ArrowRight', { range: '24h', stepMinutes: 15 }, true)).toBe(4);
+    expect(keyboardStep('PageDown', { range: '7d', stepMinutes: 60 }, false)).toBe(24);
+    expect(keyboardStep('ArrowRight', { range: '7d', stepMinutes: 120 }, false)).toBe(1);
   });
   it('moves from now when there is no cursor', () => {
     expect(moveCursor(null, 2, 48, 52)).toBe(50);

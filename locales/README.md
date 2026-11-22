@@ -3,10 +3,14 @@
 This folder holds the built-in languages of Hestia: `it.json` (Italian, the
 default) and `en.json` (English).
 
-> Status: **M1**. `it.json` holds every message of the UI; `en.json` only has
-> its `meta` object for now. The frontend bundles `it.json` at build time
-> (`frontend/src/i18n/index.ts`); runtime loading of extra languages arrives in
-> M3 (see [`docs/implementation-plan.md`](../docs/implementation-plan.md) §9).
+> Status: **M1 complete**. `it.json` is the single catalog of the UI: every
+> user-visible text, including the names of the mock rooms and systems
+> (`mock.*`), is a message there. `en.json` only has its `meta` object for now.
+> The frontend bundles `it.json` at build time (`frontend/src/i18n/index.ts`), and
+> a unit test (`frontend/tests/clima/catalog.test.ts`) fails on a key the code uses
+> but the file lacks, and on a key nothing uses. The English translation, a
+> `locale.schema.json` and runtime loading of extra languages (the lookup order
+> below) arrive in M3 (see [`docs/implementation-plan.md`](../docs/implementation-plan.md) §5 and §9).
 
 ## File format
 
@@ -21,8 +25,8 @@ describes the language:
     "name": "Italiano",
     "fallback": "en"
   },
-  "clima.room.title": "Stanza",
-  "clima.summary.heatingOn": "{count, plural, one {# calorifero acceso} other {# caloriferi accesi}}"
+  "module.clima.stanza": "Stanza",
+  "clima.tutte.openRoomLabel": "Apri la stanza {room}"
 }
 ```
 
@@ -40,12 +44,9 @@ Rules:
 - Adapter messages live in the `adapter.<id>.*` namespace; configuration
   schemas reference them through `x-i18n`.
 
-A `locale.schema.json` describing this format will be added together with the
-first real messages.
-
 ## Lookup order
 
-When looking up a message, Hestia tries, in order:
+Planned for M3: when looking up a message, Hestia will try, in order:
 
 1. `/data/locales/<lang>.json` (languages added by the user, no rebuild needed);
 2. the built-in languages in this folder;
@@ -55,10 +56,11 @@ When looking up a message, Hestia tries, in order:
 
 ## Adding a language
 
-1. Copy `en.json` to `<lang>.json` (for example `de.json`) and translate every value,
+1. Copy `it.json` (the complete catalog until `en.json` is filled in M3) to
+   `<lang>.json` (for example `de.json`) and translate every value,
    keeping the keys and the ICU placeholders (`{count}`, `{name}`, ...) unchanged.
 2. Set `meta.name` and, if useful, `meta.fallback`.
-3. To try it without rebuilding, put the file in the `locales/` folder of the
+3. From M3, to try it without rebuilding, put the file in the `locales/` folder of the
    `hestia-data` volume (`/data/locales/` inside the backend container).
 4. To ship it with Hestia, open a pull request adding the file here
    (see [CONTRIBUTING.md](../CONTRIBUTING.md)).

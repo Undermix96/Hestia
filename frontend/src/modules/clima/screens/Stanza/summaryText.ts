@@ -2,6 +2,7 @@
 // Per-kind messages fall back to their `.generic` variant when a kind has no dedicated text.
 import { t, tDynamic } from '../../../../i18n';
 import { fmt } from '../../../../i18n/format';
+import { percentOrMissing, temperatureOrMissing } from '../../components/chartTexts';
 import type { NextChangeFact, SummaryFacts, SystemFact } from '../../logic/summaryFacts';
 
 export interface SummaryText {
@@ -15,26 +16,18 @@ export interface SummaryText {
   full: string;
 }
 
-function temp(v: number | null): string {
-  return v == null ? t('common.missingValue') : fmt.temp(v);
-}
-
-function pct(v: number | null): string {
-  return v == null ? t('common.missingValue') : fmt.pct(v);
-}
-
 /** Every value a system message may use (ICU throws on a missing argument). */
 function systemSentence(fact: SystemFact): string {
   const s = fact.state;
   const targetC = 'targetC' in s ? s.targetC : null;
   const values = {
     system: fact.displayName,
-    target: temp(targetC),
+    target: temperatureOrMissing(targetC),
     hasTarget: String(targetC != null),
     overshoot: String(s.type === 'heatingTowards' && s.overshoot),
-    temperature: temp(s.type === 'inRange' ? s.temperatureC : null),
-    low: temp(s.type === 'inRange' ? s.lowC : null),
-    high: temp(s.type === 'inRange' ? s.highC : null),
+    temperature: temperatureOrMissing(s.type === 'inRange' ? s.temperatureC : null),
+    low: temperatureOrMissing(s.type === 'inRange' ? s.lowC : null),
+    high: temperatureOrMissing(s.type === 'inRange' ? s.highC : null),
   };
   return tDynamic(
     `clima.summary.system.${s.type}.${fact.messageKind}`,
@@ -49,7 +42,7 @@ function nextSentence(next: NextChangeFact, timeZone: string): string {
     `clima.summary.next.${next.change}.generic`,
     {
       time: fmt.time(next.at, timeZone),
-      target: temp(next.targetC),
+      target: temperatureOrMissing(next.targetC),
       system: next.displayName,
       hasTarget: String(next.targetC != null),
     },
@@ -65,9 +58,9 @@ export function renderSummary(f: SummaryFacts, timeZone: string): SummaryText {
   if (f.next) parts.push(nextSentence(f.next, timeZone));
   const rest = parts.join(' ');
   const conditions = t('clima.summary.conditions', {
-    humidity: pct(f.conditions.humidityPct),
-    outdoor: temp(f.conditions.outdoorC),
-    outdoorHumidity: pct(f.conditions.outdoorHumidityPct),
+    humidity: percentOrMissing(f.conditions.humidityPct),
+    outdoor: temperatureOrMissing(f.conditions.outdoorC),
+    outdoorHumidity: percentOrMissing(f.conditions.outdoorHumidityPct),
   });
   return { lead, rest, conditions, full: rest ? `${lead} ${rest}` : lead };
 }

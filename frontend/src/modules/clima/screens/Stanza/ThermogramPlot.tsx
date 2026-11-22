@@ -205,7 +205,7 @@ export function ThermogramPlot({
       onEscape();
       return;
     }
-    const step = keyboardStep(e.key, range, e.shiftKey);
+    const step = keyboardStep(e.key, tl.grid, e.shiftKey);
     if (step === null) return;
     e.preventDefault();
     onCursor(moveCursor(index, step, nowIndex, n));

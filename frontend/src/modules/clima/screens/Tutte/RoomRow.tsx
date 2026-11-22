@@ -35,7 +35,12 @@ export function RoomRow({ row, names }: { row: OverviewRow; names: RoomNames }) 
       <Link
         to={href}
         className={styles.open}
-        aria-label={t('clima.tutte.openRoomLabel', { room: nameOf(names, targetId) })}
+        aria-label={
+          targetId === row.room.id
+            ? t('clima.tutte.openRoomLabel', { room: nameOf(names, targetId) })
+            : // A sensorless row opens the room it follows: name the row too, so the two links differ.
+              t('clima.tutte.openFollowedRoomLabel', { from: nameOf(names, row.room.id), room: nameOf(names, targetId) })
+        }
       >
         {t('clima.tutte.openRoom')}
         <span aria-hidden="true">→</span>

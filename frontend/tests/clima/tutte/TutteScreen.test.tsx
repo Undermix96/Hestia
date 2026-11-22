@@ -108,7 +108,7 @@ describe('TutteScreen', () => {
     // Same strip as the bagno zone.
     expect(strips('ripostiglio')[0]!.innerHTML).toBe(strips('bagno')[0]!.innerHTML);
 
-    const link = within(row).getByRole('link', { name: 'Apri la stanza Bagno' });
+    const link = within(row).getByRole('link', { name: 'Ripostiglio: apri la stanza Bagno' });
     fireEvent.click(link);
     expect(await screen.findByTestId('stanza-probe')).toHaveTextContent('/clima/stanza/bagno?scenario=home');
   });
@@ -119,13 +119,16 @@ describe('TutteScreen', () => {
     expect(links).toHaveLength(6);
     expect(links[0]).toHaveAttribute('href', '/clima/stanza/soggiorno?scenario=home');
     expect(links[0]).toHaveAccessibleName('Apri la stanza Soggiorno');
+    // Every link has its own name (the sensorless row names itself, not only the room it opens).
+    const linkNames = links.map((l) => l.getAttribute('aria-label'));
+    expect(new Set(linkNames).size).toBe(links.length);
   });
 
   it('handles manyRooms: three strips in one row and an unknown kind', async () => {
     await renderScenario('manyRooms');
     expect(strips('soggiorno')).toHaveLength(3);
     const row = screen.getByTestId('tutte-row-soggiorno');
-    expect(within(row).getByText(/^Deumidificatore /)).toBeInTheDocument();
+    expect(within(row).getByText('deumidificatore spento')).toBeInTheDocument();
     expect(valueTexts('soggiorno')).toHaveLength(5);
     expect(valueTexts('lavanderia')).toEqual(['—', 'nessun sensore']);
     expect(screen.getByTestId('tutte-chart-lavanderia')).toHaveTextContent('segue Bagno di servizio');
@@ -166,10 +169,15 @@ describe('TutteScreen', () => {
   it('shows past days in the 7d readout', async () => {
     useClimaStore.getState().setRange('7d');
     await renderScenario('home');
+    // Wait for the 7d grid and for the cursor the focus puts at now before pressing keys
+    // (under load the first render may still be settling).
+    await waitFor(() => expect(Number(slider().getAttribute('aria-valuemax'))).toBeGreaterThan(51));
     const s = slider();
     act(() => s.focus());
+    await waitFor(() => expect(useClimaStore.getState().cursorIndex).not.toBeNull());
+    expect(readout()).toBe('adesso · 08:30');
     fireEvent.keyDown(s, { key: 'PageUp' });
-    expect(readout()).toBe('gio 19 · 08:30');
+    await waitFor(() => expect(readout()).toBe('gio 19 · 08:30'));
   });
 
   it('updates the hidden table with the cursor', async () => {

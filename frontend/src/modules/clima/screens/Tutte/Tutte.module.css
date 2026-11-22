@@ -260,3 +260,18 @@
 .axis {
   margin: 0 184px 0 244px;
 }
+
+/* Narrow windows (tablet): narrower side columns leave the charts room for the axis labels. */
+@media (max-width: 1279px) {
+  .left {
+    width: 180px;
+  }
+
+  .right {
+    width: 130px;
+  }
+
+  .axis {
+    margin: 0 144px 0 194px;
+  }
+}

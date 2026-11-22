@@ -105,7 +105,7 @@
 }
 @keyframes m-np {
   50% {
-    box-shadow: 0 0 0 8px rgba(255, 138, 76, 0);
+    box-shadow: 0 0 0 8px var(--c-now-glow-end);
   }
 }
 

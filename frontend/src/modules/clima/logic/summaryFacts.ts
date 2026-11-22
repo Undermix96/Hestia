@@ -46,8 +46,6 @@ export type SystemFactState =
   | { type: 'off' }
   | { type: 'unknown' };
 
-export type SystemFactType = SystemFactState['type'];
-
 export interface SystemFact {
   systemId: string;
   kind: string;

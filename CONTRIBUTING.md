@@ -56,8 +56,13 @@ npm run typecheck
 npm run test
 npm run build
 npx playwright install chromium   # once
-npm run e2e
+npm run e2e                       # screenshot tests (@visual) run on Linux only
 ```
+
+The screenshot baselines in `frontend/e2e/__screenshots__/` are Linux renders made
+in the Playwright Docker image (the same image as the CI `e2e` job). If you change
+how the `home` screens look, regenerate them with the Docker command in
+[frontend/README.md](frontend/README.md#screenshots) and review them before committing.
 
 If you change the API (an endpoint or a backend model), regenerate the contract with
 `uv run python -m hestia.export_openapi` (from `backend/`), then the frontend types with

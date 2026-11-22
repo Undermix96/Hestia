@@ -2,16 +2,8 @@
 import type { RoomTimeline } from '../../../../api/types';
 import { t, tDynamic } from '../../../../i18n';
 import { fmt } from '../../../../i18n/format';
-import { cursorWhen as gridCursorWhen } from '../../components/chartTexts';
+import { cursorWhen as gridCursorWhen, percentOrMissing, temperatureOrMissing } from '../../components/chartTexts';
 import { sampleAt } from '../../thermogram/samples';
-
-function temp(v: number | null | undefined): string {
-  return v == null ? t('common.missingValue') : fmt.temp(v);
-}
-
-function pct(v: number | null | undefined): string {
-  return v == null ? t('common.missingValue') : fmt.pct(v);
-}
 
 /** Room temperature at sample i (measured up to now, forecast after). */
 export function roomTemperatureAt(tl: RoomTimeline, i: number): number | null {
@@ -26,16 +18,16 @@ export function cursorWhen(tl: RoomTimeline, i: number): string {
 /** "21,3° · 49%" for the room at sample i. */
 export function roomValueAt(tl: RoomTimeline, i: number): string {
   return t('clima.cursor.value', {
-    temperature: temp(roomTemperatureAt(tl, i)),
-    humidity: pct(sampleAt(tl.climate.measuredHumidityPct, tl.climate.forecastHumidityPct, i)),
+    temperature: temperatureOrMissing(roomTemperatureAt(tl, i)),
+    humidity: percentOrMissing(sampleAt(tl.climate.measuredHumidityPct, tl.climate.forecastHumidityPct, i)),
   });
 }
 
 /** "7,1° · 81%" outdoors at sample i. */
 export function outdoorValueAt(tl: RoomTimeline, i: number): string {
   return t('clima.cursor.value', {
-    temperature: temp(sampleAt(tl.outdoor.measuredC, tl.outdoor.forecastC, i)),
-    humidity: pct(sampleAt(tl.outdoor.measuredHumidityPct, tl.outdoor.forecastHumidityPct, i)),
+    temperature: temperatureOrMissing(sampleAt(tl.outdoor.measuredC, tl.outdoor.forecastC, i)),
+    humidity: percentOrMissing(sampleAt(tl.outdoor.measuredHumidityPct, tl.outdoor.forecastHumidityPct, i)),
   });
 }
 
@@ -48,5 +40,5 @@ export function systemTargetText(kind: string, targetC: number | null | undefine
 
 /** aria-valuetext of the cursor slider. */
 export function cursorValueText(tl: RoomTimeline, i: number): string {
-  return t('clima.cursor.valueText', { when: cursorWhen(tl, i), temperature: temp(roomTemperatureAt(tl, i)) });
+  return t('clima.cursor.valueText', { when: cursorWhen(tl, i), temperature: temperatureOrMissing(roomTemperatureAt(tl, i)) });
 }

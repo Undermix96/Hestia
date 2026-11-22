@@ -1,6 +1,6 @@
 # Hestia: piano di implementazione
 
-> Stato: **M0 rilasciato come v0.1.0 e chiuso** (21 novembre 2026); prossimo passo M1. Decisioni aperte chiuse il 20 novembre 2026. Rispetto all'handoff: niente pulsanti di modalità nella scheda «Corrente climatizzatori». Specifica di design: [`docs/design/HANDOFF.md`](design/HANDOFF.md).
+> Stato: **M1 completato, da rilasciare come v0.2.0** (22 novembre 2026); M0 rilasciato come v0.1.0 e chiuso (21 novembre 2026); prossimo passo M2. Decisioni aperte chiuse il 20 novembre 2026. Rispetto all'handoff: niente pulsanti di modalità nella scheda «Corrente climatizzatori». Specifica di design: [`docs/design/HANDOFF.md`](design/HANDOFF.md).
 
 ## Contesto
 
@@ -272,7 +272,7 @@ Hestia/
 - [x] Token per il tag di release: secret `RELEASE_TOKEN` (fine-grained, *Contents* e *Workflows* in scrittura sul solo repo Hestia) usato dal job `release` di `docker-build.yml`; il job `version` si ferma subito se il secret manca. Il token scade: va rinnovato e il secret aggiornato.
 - [x] Vecchio pacchetto GHCR `hestia`: non è mai stato pubblicato, quindi non c'è nulla da deprecare.
 
-### M1: UI fedele ai mockup, guidata dalle capacità, su dati simulati (v0.2.0)
+### M1: UI fedele ai mockup, guidata dalle capacità, su dati simulati (v0.2.0) — completato
 
 **Contenuto**
 - Contratto generico (§1) in Pydantic, con i tipi TS generati.
@@ -303,6 +303,25 @@ Hestia/
   - confronto manuale con `docs/design/screenshots`, poi baseline con tolleranza;
   - controllo axe.
 - Gli altri scenari solo come smoke test.
+
+**Esito (22 novembre 2026)**
+- Consegnato tutto il contenuto: contratto Pydantic (`core/` + `api/clima_models.py`) con `schema.d.ts` generato (`npm run gen:api`, CI con `check:api`); `MockDataSource` con i 5 scenari; token, font in self-hosting, header dal registro dei moduli; le schermate Stanza e Tutte le stanze con corsie, `ProgramBar` per ogni rappresentazione (`levels`, `perSlot`, `onOff`, `none`), `SlotEditor`, cursore da mouse e tastiera, tabelle nascoste e animazioni.
+- Verifica: Vitest (737 test, tra cui la parità con gli script dei mockup e il controllo del catalogo), Playwright (smoke di tutti gli scenari, Stanza e Tutte su `home`, axe su ogni stanza di `home` in 24 ore e 7 giorni, 5 screenshot di riferimento), backend con ruff, mypy strict, import-linter e pytest.
+- Scelte emerse durante l'implementazione:
+  - le rotte del contratto (`GET /api/rooms`, `/api/clima/rooms/{id}/timeline`, `/api/clima/overview`, `POST /api/overrides`, `DELETE /api/overrides/{id}`) esistono con i modelli definitivi ma rispondono **503** `{"code": "no_data_source"}` fino a M2; con `?source=http` la UI mostra la schermata d'errore;
+  - nell'OpenAPI ogni proprietà è `required` (i campi nulli viaggiano come `null`, mai omessi), così i tipi TS non hanno campi facoltativi;
+  - `locales/it.json` alla radice è l'unico catalogo (anche i nomi delle stanze e degli impianti simulati, `mock.*`); un test controlla chiavi mancanti e inutilizzate; `en.json` resta solo `meta`;
+  - il mock riproduce **bit per bit** la simulazione di `Neng.js` (i test eseguono gli script dei mockup come oracolo), comprese le due simulazioni separate per 24 ore e 7 giorni (Soggiorno 21,8° contro 21,5°);
+  - in `home` tutti i giorni usano il programma feriale, quindi il fine settimana inizia alle 06:00 e non alle 07:30 del mockup; la variante 07:30 è nello scenario `perSlot`;
+  - header con «Hestia», senza Energia, Luci e «+ modulo»; orologio fisso alle 08:30 (i mockup mostrano 08:37); modalità dei climatizzatori come testo, senza pulsanti;
+  - l'editor delle fasce ha un selettore dello scope («solo questa fascia», «permanente: valore», «permanente: orari»), limitato a quanto permettono le capacità; le fasce passate non sono cliccabili;
+  - una modifica vale da adesso in poi: divide la fascia in corso all'istante attuale; la fine giornata si scrive «24:00» (non «00:00»);
+  - con `prefers-reduced-motion` si fermano le animazioni e sparisce l'anello pulsante dei pallini di stato; il passaggio tra 24 ore e 7 giorni non anima le linee (i path hanno un numero diverso di punti, come nel mockup);
+  - accessibilità (axe): le etichette sulle fasce più calde (da circa 22,5°) passano dal bianco al nero, perché il bianco sul colore dei 23° ha contrasto 4,1:1; in Tutte le stanze il testo «standby/spento» usa il grigio del testo, non quello del pallino;
+  - layout tablet (768–1279 px): consumi e programma uno sotto l'altro, colonne laterali di Tutte le stanze più strette e, su grafici stretti, un'etichetta di giorno sì e una no;
+  - i mini grafici di Tutte le stanze tagliano la scala a 15–24° come il mockup: un valore fuori scala resta sul bordo;
+  - le schermate sono caricate in modo lazy (un chunk per schermata);
+  - gli screenshot di riferimento sono render **Linux** generati nell'immagine Docker di Playwright (stessa versione di `@playwright/test`); su Windows e macOS i test `@visual` vengono saltati; in CI Playwright gira in un job `e2e` dentro la stessa immagine.
 
 ### M2: core, framework degli adattatori e adattatori v1 in sola lettura (v0.3.0)
 
@@ -473,7 +492,8 @@ Hestia/
 **Workflow**
 - `tests.yml` (riusabile, `workflow_call`):
   - backend: ruff, mypy, import-linter, pytest (core, contratti di tutti gli adattatori, API), con service container `influxdb:2`;
-  - frontend: eslint, tsc, vitest, controllo dei tipi generati rispetto a `openapi.json`, Playwright sugli scenari mock.
+  - frontend: eslint, tsc, vitest, controllo dei tipi generati rispetto a `openapi.json` e build;
+  - e2e: Playwright sugli scenari mock, con confronto degli screenshot, dentro l'immagine `mcr.microsoft.com/playwright` in cui sono generate le baseline.
 - `ci.yml`: sulle PR e sui push a `main` richiama `tests.yml` (i branch si testano tramite la loro PR).
 - `docker-build.yml`: avvio manuale, solo da `main`.
 

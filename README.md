@@ -15,10 +15,12 @@ adapter supports. See [docs/architecture.md](docs/architecture.md).
 
 ## Status
 
-**Pre-alpha — M0 released as `v0.1.0`** (skeleton, CI and license); next is M1. The images build and run,
-but the dashboard only shows its version for now: there is nothing useful to
-install yet. The roadmap is in
-[docs/implementation-plan.md](docs/implementation-plan.md) §5.
+**Pre-alpha — M1 complete, to be released as `v0.2.0`** (M0, the skeleton, was
+released as `v0.1.0`). The Climate module's "Room" and "All rooms" screens are
+finished, but they run on **simulated data** (a fixed clock and a few mock
+houses, selectable with `?scenario=`): Hestia does not read Home Assistant yet,
+so there is still nothing useful to install. Real data arrives in M2. The
+roadmap is in [docs/implementation-plan.md](docs/implementation-plan.md) §5.
 
 ## Quick start
 

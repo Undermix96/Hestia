@@ -4,6 +4,10 @@
  * Entities carry either a free `name` (set by the user) or a `nameKey` (a
  * catalog message, e.g. the mock fixtures under `mock.*`); systems without
  * either fall back to their kind's name (`kind.<kind>.*`, then `kind.generic.*`).
+ *
+ * Like the kinds, a system's `nameKey` may have a short and a lowercase form for
+ * running text (`<nameKey>.short`, `<nameKey>.lower`); without them the plain
+ * message is used. A free `name` is always shown as the user typed it.
  */
 import type { Action, Level, Mode } from '../../api/types';
 import { hasMessage, t, tDynamic } from '../../i18n';
@@ -27,12 +31,22 @@ export function systemName(s: Named & { kind: string }): string {
   return ownName(s) ?? tDynamic(`kind.${s.kind}.name`, 'kind.generic.name');
 }
 
-export function systemShortName(s: Named & { kind: string }): string {
-  return ownName(s) ?? tDynamic(`kind.${s.kind}.short`, 'kind.generic.short');
+type NameForm = 'short' | 'lower';
+
+function systemFormName(s: Named & { kind: string }, form: NameForm): string {
+  if (s.name !== null) return s.name;
+  const own = s.nameKey !== null ? (message(`${s.nameKey}.${form}`) ?? message(s.nameKey)) : null;
+  return own ?? tDynamic(`kind.${s.kind}.${form}`, `kind.generic.${form}`);
 }
 
+/** Name in a status line ("caloriferi standby", "clima spento"). */
+export function systemShortName(s: Named & { kind: string }): string {
+  return systemFormName(s, 'short');
+}
+
+/** Name inside a sentence ("caloriferi + climatizzatore"). */
 export function systemLowerName(s: Named & { kind: string }): string {
-  return ownName(s) ?? tDynamic(`kind.${s.kind}.lower`, 'kind.generic.lower');
+  return systemFormName(s, 'lower');
 }
 
 export function actionLabel(a: Action | null): string {

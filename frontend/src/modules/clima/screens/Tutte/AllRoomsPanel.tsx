@@ -75,7 +75,7 @@ export function AllRoomsPanel({ overview, range, onRangeChange }: AllRoomsPanelP
             cursorIndex={cursorIndex}
             nowIndex={nowIndex}
             count={n}
-            range={grid.range}
+            grid={grid}
             valueText={when}
             onChange={setCursor}
           />

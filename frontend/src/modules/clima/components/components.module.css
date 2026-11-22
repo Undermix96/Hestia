@@ -169,6 +169,14 @@
   height: 14px;
   font-size: 10px;
   color: var(--c-muted);
+  container-type: inline-size;
+}
+
+/* Narrow charts (tablet widths): every other day label, so the 7-day labels never touch. */
+@container (max-width: 420px) {
+  .axisTick[data-edge='day']:nth-child(even of [data-edge='day']) {
+    visibility: hidden;
+  }
 }
 
 .axisTick {

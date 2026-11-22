@@ -24,8 +24,6 @@ export const MOTION = {
   nowPulse: 'm-nowp',
 } as const;
 
-export type MotionClass = (typeof MOTION)[keyof typeof MOTION];
-
 /** Entrance classes for a block with the given cascade step (0 = no delay). */
 export function enterClass(step: 0 | 1 | 2 | 3 | 4 = 0): string {
   return step === 0 ? MOTION.enter : `${MOTION.enter} m-e${step}`;

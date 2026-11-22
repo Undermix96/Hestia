@@ -745,7 +745,7 @@ a.tab[aria-current='page']:hover {
   border-right: 1px solid var(--c-panel);
   font-size: 10px;
   font-weight: 700;
-  color: #ffffff; /* mockup: white values on the radiator colours */
+  color: var(--c-on-fill); /* mockup: white values; WeekProgram sets the ink where white fails AA */
   padding-left: 4px;
   display: flex;
   align-items: center;
@@ -809,5 +809,13 @@ a.tab[aria-current='page']:hover {
   .thermoPanel {
     --label-col: 96px;
     --plot-offset: 108px;
+  }
+
+  /* HANDOFF §Formati: energy and program one below the other. */
+  .powerCard,
+  .weekCard,
+  .skeletonCard,
+  .skeletonWeek {
+    flex-basis: 100%;
   }
 }

@@ -33,6 +33,15 @@ describe('tutteModel', () => {
     expect(rowChartLabel(bagno, overview.grid.nowIndex, names)).toBe('Bagno: 20,4°, target 23,0°, caloriferi scalda');
   });
 
+  it('writes a missing target as the bare missing-value mark', async () => {
+    const overview = await new MockDataSource('noProgram').getOverview({ range: '24h' });
+    const names = roomNames(overview.rows.map((r) => r.room));
+    const corridoio = overview.rows.find((r) => r.room.id === 'corridoio')!;
+    const label = rowChartLabel(corridoio, overview.grid.nowIndex, names);
+    expect(label).toContain('target —,');
+    expect(label).not.toContain('—°');
+  });
+
   it('reads measured before forecast and formats missing values', () => {
     expect(sampleAt([1, null], [null, 2], 0)).toBe(1);
     expect(sampleAt([1, null], [null, 2], 1)).toBe(2);

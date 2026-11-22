@@ -1,7 +1,7 @@
 // View helpers of the Tutte le stanze screen: thin glue between the contract, the logic modules and i18n.
 import type { Action, OverviewRow, RoomView, SystemSeries, SystemStatus } from '../../../../api/types';
 import { intlLocale, t } from '../../../../i18n';
-import { fmt } from '../../../../i18n/format';
+import { degrees, percentOrMissing, temperatureOrMissing } from '../../components/chartTexts';
 import { actionLabel, roomName, systemShortName } from '../../names';
 
 /** Room opened by the row's link: the room itself, or the room a sensorless room follows. */
@@ -53,17 +53,16 @@ export function rowChartLabel(row: OverviewRow, nowIndex: number, names: RoomNam
   const target = row.target?.targetC[nowIndex] ?? null;
   return t('clima.tutte.rowChartLabel', {
     room: nameOf(names, row.room.id),
-    temperature: row.status.temperatureC === null ? t('common.missingValue') : fmt.temp(row.status.temperatureC),
-    target: target === null ? t('common.missingValue') : fmt.temp(target),
+    temperature: degrees(row.status.temperatureC),
+    target: degrees(target),
     status: joinList(row.status.systems.map((s) => statusText(s, viaRoomName(row, s, names)))),
   });
 }
 
 /** "5,9° · 83%" (missing parts as the missing-value mark). */
 export function outdoorText(temperatureC: number | null, humidityPct: number | null): string {
-  const missing = t('common.missingValue');
   return t('clima.tutte.outdoorValue', {
-    temperature: temperatureC === null ? missing : fmt.temp(temperatureC),
-    humidity: humidityPct === null ? missing : fmt.pct(humidityPct),
+    temperature: temperatureOrMissing(temperatureC),
+    humidity: percentOrMissing(humidityPct),
   });
 }

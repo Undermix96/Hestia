@@ -1,14 +1,13 @@
 /**
  * The Clima module: two menu entries (Stanza, Tutte le stanze), its routes and
- * the outdoor status in the header.
+ * the outdoor status in the header. The screens are lazy (routes/lazyScreens).
  */
 import type { AppModule } from '../../app/modules';
 import { KeepSearchNavigate } from '../../app/keepSearch';
 import { ClimaHeaderStatus } from './ClimaHeaderStatus';
 import { CLIMA_STANZA_PATH, CLIMA_TUTTE_PATH, stanzaPath } from './paths';
+import { StanzaScreen, TutteScreen } from './routes/lazyScreens';
 import { StanzaIndex } from './routes/StanzaIndex';
-import { StanzaScreen } from './screens/Stanza/StanzaScreen';
-import { TutteScreen } from './screens/Tutte/TutteScreen';
 import { useClimaStore } from './store/climaStore';
 
 export const climaModule: AppModule = {

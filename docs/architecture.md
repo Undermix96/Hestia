@@ -85,6 +85,48 @@ planned. External adapters can be installed as Python packages exposing the
 fixtures and reusable **contract test** classes (one per port). CI runs them on
 every bundled adapter; external plugins can reuse them.
 
+## Frontend
+
+```text
+frontend/src/
+├─ app/                  shell: router, layout, header, module registry, error views
+├─ api/                  generated contract types (schema.d.ts) and the data sources
+│  └─ datasource/        DataSource interface, HttpDataSource, mock/ (MockDataSource + scenarios)
+├─ i18n/                 t() over locales/it.json, Intl formatting helpers
+├─ modules/clima/        the Climate module: screens, lanes, thermogram, pure logic, system kinds
+└─ styles/               design tokens, global styles, motion classes
+```
+
+- **Data source.** Screens never call `fetch` directly: they read data through the
+  `DataSource` interface (`getRooms`, `getRoomTimeline`, `getOverview`,
+  `createOverride`, `deleteOverride`, `subscribe`, `now`), provided by React
+  context. The payloads are the contract types generated from
+  `contract/openapi.json` (`npm run gen:api`; CI runs `check:api`), so the mock
+  and the real backend are interchangeable. `HttpDataSource` calls `/api/*`; in
+  M1 the backend answers those routes with **503** `no_data_source`, and the UI
+  shows its error view (`?source=http`).
+- **Mock scenarios.** Until the backend serves data (M2), `MockDataSource` is the
+  default. It is a bit-for-bit port of the design mockups' simulation (unit tests
+  run the mockup scripts as an oracle) with a fixed clock, 20 Nov 2026 08:30
+  Europe/Rome. `?scenario=home|perSlot|readonly|noProgram|manyRooms` picks a
+  house that exercises a set of capabilities (per-slot programs, read-only
+  programs, no program, many rooms with an unknown system kind).
+- **Capability-driven UI.** Lanes, program bars and the slot editor are built
+  from each System's `kind`, program `representation` and capabilities; unknown
+  kinds fall back to a generic spec (`modules/clima/systemKinds`).
+- **Module registry.** `src/app/modules.ts` lists the modules. Each one declares
+  its nav entries, routes and optional header status; hidden modules (Energia,
+  Luci) are registered but neither shown nor routed. The screens are loaded
+  lazily.
+- **i18n catalog.** `locales/it.json` at the repository root is the single
+  catalog (flat ICU messages); the frontend bundles it at build time and a unit
+  test checks that every key used in the code exists and none is unused. Mock
+  room, system and level names are catalog keys too (`mock.*`). `en.json` is
+  `meta`-only until M3.
+- **Tests.** Vitest for logic and components; Playwright on the production build
+  with the mock data (fixed clock, reduced motion), including axe checks and
+  screenshot baselines rendered in the Playwright Linux image.
+
 ## Principles
 
 - No user-visible text hard-coded in code: everything goes through the

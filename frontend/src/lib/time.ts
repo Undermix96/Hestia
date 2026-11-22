@@ -111,10 +111,6 @@ export function isoWithOffset(epochMs: number, timeZone: string): string {
   );
 }
 
-export function parseIso(iso: string): number {
-  return Date.parse(iso);
-}
-
 /** Hour of the day with the minute as a fraction (08:30 → 8.5), like the mockup's `hAt`. */
 export function hourOfDay(parts: LocalParts): number {
   return parts.hour + parts.minute / 60;

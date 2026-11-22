@@ -89,10 +89,35 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+  e2e:
+    name: Frontend end-to-end (Playwright)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # The screenshot baselines (frontend/e2e/__screenshots__) are rendered in this image: running the tests in
+    # it gives the same browser, fonts and rasterisation. Keep the tag equal to the installed @playwright/test
+    # version (frontend/package-lock.json) and regenerate the baselines when it changes (frontend/README.md).
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
+      options: --ipc=host
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
 
-      - name: End-to-end tests (Playwright)
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: End-to-end tests (Playwright, with screenshot comparison)
         run: npm run e2e
 
       - name: Upload Playwright report

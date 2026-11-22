@@ -60,9 +60,9 @@ export const fmt = {
   time(iso: string, tz: string): string {
     return timeFormat(tz).format(new Date(iso));
   },
-  /** Program slot boundary: '24:00' is shown as '00:00' (like the mockup). */
+  /** Program slot boundary 'HH:MM'. The end of the day stays '24:00' ("19:00–24:00", not the ambiguous "19:00–00:00"). */
   slotTime(hhmm: string): string {
-    return hhmm === '24:00' ? '00:00' : hhmm;
+    return hhmm;
   },
   /** Axis day label: 'sab 14'. */
   dayLabel(iso: string, tz: string): string {

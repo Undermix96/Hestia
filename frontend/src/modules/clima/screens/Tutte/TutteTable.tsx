@@ -1,8 +1,8 @@
 import type { OutdoorSeries, OverviewRow } from '../../../../api/types';
 import { t } from '../../../../i18n';
-import { fmt } from '../../../../i18n/format';
+import { percentOrMissing, temperatureOrMissing } from '../../components/chartTexts';
 import { sampleAt } from '../../thermogram/samples';
-import { joinList, nameOf, outdoorText, systemActionText, type RoomNames } from './tutteModel';
+import { joinList, nameOf, systemActionText, type RoomNames } from './tutteModel';
 
 export interface TutteTableProps {
   rows: readonly OverviewRow[];
@@ -10,10 +10,6 @@ export interface TutteTableProps {
   index: number;
   when: string;
   names: RoomNames;
-}
-
-function cell(v: number | null): string {
-  return v === null ? t('common.missingValue') : fmt.temp(v);
 }
 
 /** Visually hidden table: the values of every room at the cursor (the same data as the right column). */
@@ -27,6 +23,7 @@ export function TutteTable({ rows, outdoor, index, when, names }: TutteTableProp
         <tr>
           <th scope="col">{t('clima.tutte.table.room')}</th>
           <th scope="col">{t('clima.table.temperature')}</th>
+          <th scope="col">{t('clima.table.humidity')}</th>
           <th scope="col">{t('clima.table.target')}</th>
           <th scope="col">{t('clima.tutte.table.systems')}</th>
         </tr>
@@ -37,20 +34,21 @@ export function TutteTable({ rows, outdoor, index, when, names }: TutteTableProp
           return (
             <tr key={row.room.id}>
               <th scope="row">{nameOf(names, row.room.id)}</th>
-              <td>{climate === null ? t('common.missingValue') : cell(sampleAt(climate.measuredC, climate.forecastC, index))}</td>
-              <td>{climate === null ? t('clima.tutte.noSensorShort') : cell(row.target?.targetC[index] ?? null)}</td>
+              <td>{climate === null ? t('common.missingValue') : temperatureOrMissing(sampleAt(climate.measuredC, climate.forecastC, index))}</td>
+              <td>
+                {climate === null
+                  ? t('common.missingValue')
+                  : percentOrMissing(sampleAt(climate.measuredHumidityPct, climate.forecastHumidityPct, index))}
+              </td>
+              <td>{climate === null ? t('clima.tutte.noSensorShort') : temperatureOrMissing(row.target?.targetC[index] ?? null)}</td>
               <td>{joinList(row.systems.map((s) => systemActionText(s, index)))}</td>
             </tr>
           );
         })}
         <tr>
           <th scope="row">{t('clima.tutte.outdoor')}</th>
-          <td>
-            {outdoorText(
-              sampleAt(outdoor.measuredC, outdoor.forecastC, index),
-              sampleAt(outdoor.measuredHumidityPct, outdoor.forecastHumidityPct, index),
-            )}
-          </td>
+          <td>{temperatureOrMissing(sampleAt(outdoor.measuredC, outdoor.forecastC, index))}</td>
+          <td>{percentOrMissing(sampleAt(outdoor.measuredHumidityPct, outdoor.forecastHumidityPct, index))}</td>
           <td>{t('common.missingValue')}</td>
           <td>{t('common.missingValue')}</td>
         </tr>

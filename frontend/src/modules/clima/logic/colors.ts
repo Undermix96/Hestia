@@ -26,12 +26,53 @@ export const PALETTE = {
   idleA: '#46525B',
   idleB: '#2A333A',
   dotIdle: '#6A767F',
+  onFill: '#FFFFFF',
+  onFillInk: '#000000',
 } as const;
 
 export const IDLE_PATTERN = 'repeating-linear-gradient(135deg,#46525B 0 3px,#2A333A 3px 6px)';
 
 function hexChannels(c: string): [number, number, number] {
   return [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16)) as [number, number, number];
+}
+
+/** Channels of a '#RRGGBB' or 'rgb(r,g,b)' colour; null for anything else (patterns, 'transparent'). */
+function channels(c: string): [number, number, number] | null {
+  if (/^#[0-9a-f]{6}$/i.test(c)) return hexChannels(c);
+  const m = /^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/.exec(c);
+  return m ? [Number(m[1]), Number(m[2]), Number(m[3])] : null;
+}
+
+/** WCAG 2.x relative luminance. */
+function luminance([r, g, b]: [number, number, number]): number {
+  const lin = (v: number) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+
+/** WCAG 2.x contrast ratio of two '#RRGGBB' / 'rgb()' colours (1 when either cannot be parsed). */
+export function contrastRatio(a: string, b: string): number {
+  const ca = channels(a);
+  const cb = channels(b);
+  if (!ca || !cb) return 1;
+  const la = luminance(ca);
+  const lb = luminance(cb);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
+
+/** AA minimum for the small program labels (WCAG 1.4.3). */
+const LABEL_MIN_CONTRAST = 4.5;
+
+/**
+ * Text colour of a label drawn on a program fill. White as in the mockup, unless white falls below
+ * the AA minimum on that fill (the hottest radiator colours, from about 22.5 °C): then the dark ink.
+ * Fills that are not a plain colour (transparent, patterns) keep white: the label sits on the lane.
+ */
+export function onFillTextColor(fill: string): string {
+  if (!channels(fill)) return PALETTE.onFill;
+  return contrastRatio(PALETTE.onFill, fill) >= LABEL_MIN_CONTRAST ? PALETTE.onFill : PALETTE.onFillInk;
 }
 
 /** Port of the mockup's `mix(a, b, t)`: linear blend of two '#RRGGBB' colours, t clamped to [0, 1]. */
