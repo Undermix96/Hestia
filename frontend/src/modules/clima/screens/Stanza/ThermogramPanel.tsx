@@ -3,18 +3,17 @@ import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 
 import { useDataSource } from '../../../../api/datasource/context';
 import type { ProgramSegment, RoomTimeline, SystemLane } from '../../../../api/types';
 import { t } from '../../../../i18n';
-import { fmt } from '../../../../i18n/format';
 import { enterClass } from '../../../../styles/motion';
 import { AxisLabels } from '../../components/AxisLabels';
 import { LegendSwatch } from '../../components/LegendSwatch';
 import { RangeSelector } from '../../components/RangeSelector';
+import { axisTickLabels } from '../../components/chartTexts';
 import { slotAttr } from '../../lanes/segmentText';
 import { editorAvailability, type EditorAvailability } from '../../logic/editorOptions';
 import { findSelectedSegment } from '../../logic/segments';
 import { roomName } from '../../names';
 import { useClimaStore } from '../../store/climaStore';
 import { sortByLaneOrder } from '../../systemKinds';
-import { axisTicks } from '../../thermogram/axis';
 import { SlotEditor } from './SlotEditor';
 import { ThermogramLabels, ThermogramPlot } from './ThermogramPlot';
 import { ThermogramTable } from './ThermogramTable';
@@ -86,22 +85,7 @@ export function ThermogramPanel({ tl, summary, previewError }: ThermogramPanelPr
   const systems = useMemo(() => new Map(tl.systems.map((s) => [s.id, s])), [tl]);
   const tz = tl.clock.timeZone;
 
-  const ticks = useMemo(
-    () =>
-      axisTicks(tl.grid, tz).map((tick) => ({
-        key: `${tick.kind}|${tick.index}`,
-        text:
-          tick.kind === 'now'
-            ? t('clima.axis.now')
-            : tick.kind === 'day'
-              ? fmt.dayLabel(tick.iso, tz)
-              : fmt.time(tick.iso, tz),
-        leftPct: tick.leftPct.toFixed(2),
-        isNow: tick.kind === 'now',
-        edge: tick.kind,
-      })),
-    [tl.grid, tz],
-  );
+  const ticks = useMemo(() => axisTickLabels(tl.grid, tz), [tl.grid, tz]);
 
   const hasProgram = lanes.some((l) => l.representation !== 'none');
   const anyEditable = lanes.some((lane) => {

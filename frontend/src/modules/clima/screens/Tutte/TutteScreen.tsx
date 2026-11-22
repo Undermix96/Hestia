@@ -12,12 +12,16 @@ export function TutteScreen() {
   const range = useClimaStore((s) => s.range);
   const setRange = useClimaStore((s) => s.setRange);
   const setOutdoorNow = useClimaStore((s) => s.setOutdoorNow);
+  const setCursor = useClimaStore((s) => s.setCursor);
   const overview = useOverview(range);
   const data = overview.data;
 
   useEffect(() => {
     if (data) setOutdoorNow({ temperatureC: data.outdoor.nowC, humidityPct: data.outdoor.nowHumidityPct });
   }, [data, setOutdoorNow]);
+
+  // The cursor does not follow the user to another screen.
+  useEffect(() => () => setCursor(null), [setCursor]);
 
   return (
     <>

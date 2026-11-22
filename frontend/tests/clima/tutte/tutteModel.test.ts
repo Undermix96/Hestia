@@ -1,13 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { MockDataSource } from '../../../src/api/datasource';
-import {
-  cursorWhen,
-  linkRoomId,
-  outdoorText,
-  roomNames,
-  rowChartLabel,
-  valueAt,
-} from '../../../src/modules/clima/screens/Tutte/tutteModel';
+import { cursorWhen } from '../../../src/modules/clima/components/chartTexts';
+import { linkRoomId, outdoorText, roomNames, rowChartLabel } from '../../../src/modules/clima/screens/Tutte/tutteModel';
+import { sampleAt } from '../../../src/modules/clima/thermogram/samples';
 
 describe('tutteModel', () => {
   it('formats the cursor readout per phase and range', async () => {
@@ -39,9 +34,9 @@ describe('tutteModel', () => {
   });
 
   it('reads measured before forecast and formats missing values', () => {
-    expect(valueAt([1, null], [null, 2], 0)).toBe(1);
-    expect(valueAt([1, null], [null, 2], 1)).toBe(2);
-    expect(valueAt([null], [null], 0)).toBeNull();
+    expect(sampleAt([1, null], [null, 2], 0)).toBe(1);
+    expect(sampleAt([1, null], [null, 2], 1)).toBe(2);
+    expect(sampleAt([null], [null], 0)).toBeNull();
     expect(outdoorText(5.93, 83.3)).toBe('5,9° · 83%');
     expect(outdoorText(null, null)).toBe('—° · —%');
   });

@@ -123,6 +123,10 @@
   .m-nowp {
     animation: none;
   }
+  /* Without its animation the ring would stay as a static full-size circle over the label. */
+  .m-pulse::after {
+    display: none;
+  }
   .m-morph {
     transition: none;
   }

@@ -1,39 +1,8 @@
 // View helpers of the Tutte le stanze screen: thin glue between the contract, the logic modules and i18n.
-import type { Action, OverviewRow, RoomView, SystemSeries, SystemStatus, TimeGrid, TimeRange } from '../../../../api/types';
+import type { Action, OverviewRow, RoomView, SystemSeries, SystemStatus } from '../../../../api/types';
 import { intlLocale, t } from '../../../../i18n';
 import { fmt } from '../../../../i18n/format';
-import { cursorPhase } from '../../logic/cursor';
 import { actionLabel, roomName, systemShortName } from '../../names';
-
-/** Value of a measured/forecast pair at sample i (measured wins; both are set at nowIndex). */
-export function valueAt(measured: readonly (number | null)[], forecast: readonly (number | null)[], i: number): number | null {
-  return measured[i] ?? forecast[i] ?? null;
-}
-
-/** "21,8°", or the missing-value mark. */
-export function degrees(v: number | null): string {
-  return v === null ? t('common.missingValue') : t('clima.axis.degrees', { value: fmt.temp(v) });
-}
-
-/** Cursor readout of sample `index`: "ore 06:00", "sab 14 · 06:00" (past in 7d), "adesso · 08:30", "previsione · 09:30". */
-export function cursorWhen(grid: TimeGrid, index: number, timeZone: string): string {
-  const iso = grid.t[index] ?? grid.t[grid.nowIndex] ?? '';
-  const time = fmt.time(iso, timeZone);
-  switch (cursorPhase(index, grid.nowIndex)) {
-    case 'past':
-      return pastWhen(grid.range, iso, time, timeZone);
-    case 'now':
-      return t('clima.cursor.now', { time });
-    default:
-      return t('clima.cursor.forecast', { time });
-  }
-}
-
-function pastWhen(range: TimeRange, iso: string, time: string, timeZone: string): string {
-  return range === '7d'
-    ? t('clima.cursor.past7d', { day: fmt.dayLabel(iso, timeZone), time })
-    : t('clima.cursor.past24h', { time });
-}
 
 /** Room opened by the row's link: the room itself, or the room a sensorless room follows. */
 export function linkRoomId(row: OverviewRow): string {

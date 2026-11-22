@@ -2,8 +2,8 @@ import { NavLink, useLocation } from 'react-router';
 import type { RoomStatus } from '../../../../api/types';
 import { withKeptSearch } from '../../../../app/keepSearch';
 import { t } from '../../../../i18n';
-import { fmt } from '../../../../i18n/format';
 import { enterClass } from '../../../../styles/motion';
+import { degrees } from '../../components/chartTexts';
 import { SystemStatusLine } from '../../components/SystemStatusLine';
 import { isActive } from '../../logic/colors';
 import { roomName } from '../../names';
@@ -14,10 +14,6 @@ import styles from './Stanza.module.css';
 export interface RoomTabsProps {
   rooms: readonly RoomStatus[];
   activeRoomId: string;
-}
-
-function temperatureText(v: number | null): string {
-  return v == null ? t('common.missingValue') : t('clima.axis.degrees', { value: fmt.temp(v) });
 }
 
 /** One card per room with a sensor (links), then a dashed card for each room without one (not focusable). */
@@ -42,7 +38,7 @@ export function RoomTabs({ rooms, activeRoomId }: RoomTabsProps) {
         >
           <span className={styles.tabTitle}>
             {roomName(room)}
-            <span className={`${styles.tabTemp} num`}>{temperatureText(room.temperatureC)}</span>
+            <span className={`${styles.tabTemp} num`}>{degrees(room.temperatureC)}</span>
           </span>
           <span className={styles.tabStatus}>
             {room.systems.map((s) => (

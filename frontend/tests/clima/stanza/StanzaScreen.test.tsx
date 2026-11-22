@@ -80,7 +80,7 @@ describe('StanzaScreen', () => {
     it('shows the house power and the split mode as plain text', async () => {
       await renderRoom('home');
       expect(within(power()).getByRole('heading', { level: 2 })).toHaveTextContent('Corrente climatizzatori');
-      expect(power()).toHaveTextContent('1,3 kW');
+      expect(power()).toHaveTextContent('1,3kW');
       expect(power()).toHaveTextContent('8,8 kWh');
       expect(power()).toHaveTextContent('≈ € 2,5');
       expect(power()).toHaveTextContent('Novembre: 79 kWh · € 22,10 · i caloriferi non sono misurati');

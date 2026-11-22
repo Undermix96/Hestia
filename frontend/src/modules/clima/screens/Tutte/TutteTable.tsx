@@ -1,7 +1,8 @@
 import type { OutdoorSeries, OverviewRow } from '../../../../api/types';
 import { t } from '../../../../i18n';
 import { fmt } from '../../../../i18n/format';
-import { joinList, nameOf, outdoorText, systemActionText, valueAt, type RoomNames } from './tutteModel';
+import { sampleAt } from '../../thermogram/samples';
+import { joinList, nameOf, outdoorText, systemActionText, type RoomNames } from './tutteModel';
 
 export interface TutteTableProps {
   rows: readonly OverviewRow[];
@@ -36,7 +37,7 @@ export function TutteTable({ rows, outdoor, index, when, names }: TutteTableProp
           return (
             <tr key={row.room.id}>
               <th scope="row">{nameOf(names, row.room.id)}</th>
-              <td>{climate === null ? t('common.missingValue') : cell(valueAt(climate.measuredC, climate.forecastC, index))}</td>
+              <td>{climate === null ? t('common.missingValue') : cell(sampleAt(climate.measuredC, climate.forecastC, index))}</td>
               <td>{climate === null ? t('clima.tutte.noSensorShort') : cell(row.target?.targetC[index] ?? null)}</td>
               <td>{joinList(row.systems.map((s) => systemActionText(s, index)))}</td>
             </tr>
@@ -46,8 +47,8 @@ export function TutteTable({ rows, outdoor, index, when, names }: TutteTableProp
           <th scope="row">{t('clima.tutte.outdoor')}</th>
           <td>
             {outdoorText(
-              valueAt(outdoor.measuredC, outdoor.forecastC, index),
-              valueAt(outdoor.measuredHumidityPct, outdoor.forecastHumidityPct, index),
+              sampleAt(outdoor.measuredC, outdoor.forecastC, index),
+              sampleAt(outdoor.measuredHumidityPct, outdoor.forecastHumidityPct, index),
             )}
           </td>
           <td>{t('common.missingValue')}</td>

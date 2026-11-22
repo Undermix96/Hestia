@@ -2,11 +2,12 @@ import { Link } from 'react-router';
 import type { OverviewRow } from '../../../../api/types';
 import { useKeptSearchLink } from '../../../../app/keepSearch';
 import { t } from '../../../../i18n';
+import { degrees } from '../../components/chartTexts';
 import { SystemStatusLine } from '../../components/SystemStatusLine';
 import { isActive } from '../../logic/colors';
 import { stanzaPath } from '../../paths';
 import { kindSpec } from '../../systemKinds';
-import { degrees, linkRoomId, nameOf, viaRoomName, type RoomNames } from './tutteModel';
+import { linkRoomId, nameOf, viaRoomName, type RoomNames } from './tutteModel';
 import styles from './Tutte.module.css';
 
 /** Left cell of a room row: name, temperature now, one status line per system, link to the room. */

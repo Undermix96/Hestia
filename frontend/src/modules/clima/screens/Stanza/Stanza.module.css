@@ -379,6 +379,8 @@ a.tab[aria-current='page']:hover {
   white-space: nowrap;
   pointer-events: none;
   box-shadow: var(--shadow-tooltip);
+  /* The mockup's min-width sizes the content box (no border-box there). */
+  box-sizing: content-box;
   min-width: 230px;
   z-index: 5;
 }
@@ -590,7 +592,8 @@ a.tab[aria-current='page']:hover {
 }
 
 .powerCard {
-  flex: 1 1 340px;
+  /* The mockup's flex bases (340/560px) size the content box: add the 2 x 22px padding. */
+  flex: 1 1 384px;
   padding: var(--panel-pad);
   display: flex;
   flex-direction: column;
@@ -668,7 +671,7 @@ a.tab[aria-current='page']:hover {
 }
 
 .weekCard {
-  flex: 2 1 560px;
+  flex: 2 1 604px;
   padding: var(--panel-pad);
   display: flex;
   flex-direction: column;
@@ -792,12 +795,12 @@ a.tab[aria-current='page']:hover {
 }
 
 .skeletonCard {
-  flex: 1 1 340px;
+  flex: 1 1 384px;
   min-height: 300px;
 }
 
 .skeletonWeek {
-  flex: 2 1 560px;
+  flex: 2 1 604px;
   min-height: 300px;
 }
 

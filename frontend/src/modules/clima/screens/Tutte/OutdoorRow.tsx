@@ -4,7 +4,8 @@ import { t } from '../../../../i18n';
 import { MOTION } from '../../../../styles/motion';
 import { outdoorChartPaths } from '../../thermogram/paths';
 import { TUTTE_OUT_H, VIEW_W } from '../../thermogram/scales';
-import { outdoorText, valueAt } from './tutteModel';
+import { sampleAt } from '../../thermogram/samples';
+import { outdoorText } from './tutteModel';
 import styles from './Tutte.module.css';
 
 /** Left cell of the outdoor row: "Esterno" and the conditions now. */
@@ -58,8 +59,8 @@ export function OutdoorRight({ outdoor, index }: { outdoor: OutdoorSeries; index
     <div className={`${styles.outdoorRow} ${styles.outdoorRight}`}>
       <span className={`num ${styles.outdoorCursor}`} data-testid="tutte-outdoor-cursor">
         {outdoorText(
-          valueAt(outdoor.measuredC, outdoor.forecastC, index),
-          valueAt(outdoor.measuredHumidityPct, outdoor.forecastHumidityPct, index),
+          sampleAt(outdoor.measuredC, outdoor.forecastC, index),
+          sampleAt(outdoor.measuredHumidityPct, outdoor.forecastHumidityPct, index),
         )}
       </span>
     </div>

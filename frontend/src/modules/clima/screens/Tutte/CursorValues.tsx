@@ -1,14 +1,16 @@
 import type { OverviewRow } from '../../../../api/types';
 import { t } from '../../../../i18n';
 import { fmt } from '../../../../i18n/format';
+import { degrees } from '../../components/chartTexts';
 import { actionDotColor } from '../../logic/colors';
-import { actionAt, degrees, systemActionText, valueAt } from './tutteModel';
+import { sampleAt } from '../../thermogram/samples';
+import { actionAt, systemActionText } from './tutteModel';
 import styles from './Tutte.module.css';
 
 /** Right cell of a room row: temperature, target and each system's action at the cursor. */
 export function CursorValues({ row, index }: { row: OverviewRow; index: number }) {
   const climate = row.climate;
-  const temperature = climate === null ? null : valueAt(climate.measuredC, climate.forecastC, index);
+  const temperature = climate === null ? null : sampleAt(climate.measuredC, climate.forecastC, index);
   const target = row.target?.targetC[index] ?? null;
   let targetText: string;
   if (climate === null) targetText = t('clima.tutte.noSensorShort');

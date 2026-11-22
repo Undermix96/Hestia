@@ -19,19 +19,51 @@ test('/ opens the first room and shows the app shell', async ({ page }) => {
 
   await expect(nav.getByRole('link', { name: it['module.energia.name'] })).toHaveCount(0);
   await expect(nav.getByRole('link', { name: it['module.luci.name'] })).toHaveCount(0);
-  // Attached, not visible: until the Stanza screen lands its only content is a visually hidden heading.
-  await expect(page.getByRole('main')).toBeAttached();
+  await expect(page.getByRole('main')).toBeVisible();
 });
 
 test('?scenario survives navigation', async ({ page }) => {
   await page.goto('/?scenario=perSlot');
   await expect(page).toHaveURL(/\/clima\/stanza\/soggiorno\?scenario=perSlot$/);
+  const nav = page.getByRole('navigation', { name: it['nav.label'] });
 
-  await page.getByRole('link', { name: it['module.clima.tutte'] }).click();
+  await nav.getByRole('link', { name: it['module.clima.tutte'], exact: true }).click();
   await expect(page).toHaveURL(/\/clima\/tutte\?scenario=perSlot$/);
 
-  await page.getByRole('link', { name: it['module.clima.stanza'] }).click();
+  await nav.getByRole('link', { name: it['module.clima.stanza'], exact: true }).click();
   await expect(page).toHaveURL(/\/clima\/stanza\/[^?]+\?scenario=perSlot$/);
+});
+
+test('"apri la stanza" opens that room with ?scenario kept and the header in sync', async ({ page }) => {
+  await page.goto('/clima/tutte?scenario=perSlot');
+  const nav = page.getByRole('navigation', { name: it['nav.label'] });
+  await expect(nav.getByRole('link', { name: it['module.clima.tutte'], exact: true })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+
+  await page.getByTestId('tutte-row-camera').getByRole('link').click();
+  await expect(page).toHaveURL(/\/clima\/stanza\/camera\?scenario=perSlot$/);
+  await expect(page.getByRole('main')).toBeVisible();
+  const stanzaLink = nav.getByRole('link', { name: it['module.clima.stanza'], exact: true });
+  await expect(stanzaLink).toHaveAttribute('aria-current', 'page');
+  await expect(stanzaLink).toHaveAttribute('href', '/clima/stanza/camera?scenario=perSlot');
+});
+
+test('the range is shared by Stanza and Tutte', async ({ page }) => {
+  await page.goto('/clima/tutte');
+  const range = () => page.getByRole('group', { name: it['clima.range.label'] });
+  await range().getByRole('button', { name: it['clima.range.7d'] }).click();
+  await expect(range().getByRole('button', { name: it['clima.range.7d'] })).toHaveAttribute('aria-pressed', 'true');
+
+  const nav = page.getByRole('navigation', { name: it['nav.label'] });
+  await nav.getByRole('link', { name: it['module.clima.stanza'], exact: true }).click();
+  await expect(page).toHaveURL(/\/clima\/stanza\/soggiorno$/);
+  await expect(range().getByRole('button', { name: it['clima.range.7d'] })).toHaveAttribute('aria-pressed', 'true');
+  await range().getByRole('button', { name: it['clima.range.24h'] }).click();
+
+  await nav.getByRole('link', { name: it['module.clima.tutte'], exact: true }).click();
+  await expect(range().getByRole('button', { name: it['clima.range.24h'] })).toHaveAttribute('aria-pressed', 'true');
 });
 
 const SCENARIOS = ['home', 'perSlot', 'readonly', 'noProgram', 'manyRooms'] as const;
@@ -51,9 +83,9 @@ for (const scenario of SCENARIOS) {
     const errors = collectErrors(page);
     await page.goto(`/clima/stanza?scenario=${scenario}`);
     await expect(page).toHaveURL((url) => url.pathname === '/clima/stanza/soggiorno' && url.search === `?scenario=${scenario}`);
-    await expect(page.getByRole('main')).toBeAttached();
+    await expect(page.getByRole('main')).toBeVisible();
     await page.goto(`/clima/tutte?scenario=${scenario}`);
-    await expect(page.getByRole('main')).toBeAttached();
+    await expect(page.getByRole('main')).toBeVisible();
     expect(errors).toEqual([]);
   });
 }

@@ -29,7 +29,9 @@ export const xCenter = (i: number, n: number) => ((i + 0.5) / n) * VIEW_W;
 /** Left edge of sample i. */
 export const xEdge = (i: number, n: number) => (i / n) * VIEW_W;
 /** Position of the "now" line in percent. */
-export const nowPct = (nowIndex: number, n: number) => ((nowIndex + 0.5) / n) * 100;
+/** Centre of sample i, in percent of the chart width. */
+export const centerPct = (i: number, n: number) => ((i + 0.5) / n) * 100;
+export const nowPct = (nowIndex: number, n: number) => centerPct(nowIndex, n);
 
 /** A program segment shows its value when its width (percent) is larger than this. */
 export const SEGMENT_LABEL_MIN_WIDTH_PCT: Record<TimeRange, number> = { '24h': 6, '7d': 2.2 };

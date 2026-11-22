@@ -1,15 +1,14 @@
 import { useMemo, type PointerEvent } from 'react';
 import type { ClimaOverview, TimeRange } from '../../../../api/types';
 import { t } from '../../../../i18n';
-import { fmt } from '../../../../i18n/format';
 import { enterClass } from '../../../../styles/motion';
-import { AxisLabels, type AxisTickLabel } from '../../components/AxisLabels';
+import { AxisLabels } from '../../components/AxisLabels';
 import { ForecastHatch } from '../../components/ForecastHatch';
 import { NowLine } from '../../components/NowLine';
+import { axisTickLabels, cursorWhen } from '../../components/chartTexts';
 import { indexFromPointer } from '../../logic/cursor';
 import { useClimaStore } from '../../store/climaStore';
-import { axisTicks } from '../../thermogram/axis';
-import { nowPct } from '../../thermogram/scales';
+import { centerPct, nowPct } from '../../thermogram/scales';
 import { CursorSlider } from './CursorSlider';
 import { CursorValues } from './CursorValues';
 import { OutdoorCenter, OutdoorLeft, OutdoorRight } from './OutdoorRow';
@@ -17,7 +16,7 @@ import { RoomRow } from './RoomRow';
 import { RowChart } from './RowChart';
 import { TopBar } from './TopBar';
 import { TutteTable } from './TutteTable';
-import { cursorWhen, roomNames } from './tutteModel';
+import { roomNames } from './tutteModel';
 import styles from './Tutte.module.css';
 
 export interface AllRoomsPanelProps {
@@ -41,22 +40,7 @@ export function AllRoomsPanel({ overview, range, onRangeChange }: AllRoomsPanelP
   const names = useMemo(() => roomNames(rows.map((r) => r.room)), [rows]);
   const nowLeft = nowPct(nowIndex, n).toFixed(2);
 
-  const ticks = useMemo(
-    (): AxisTickLabel[] =>
-      axisTicks(grid, tz).map((tick) => ({
-        key: `${tick.kind}-${tick.index}`,
-        text:
-          tick.kind === 'now'
-            ? t('clima.axis.now')
-            : tick.kind === 'day'
-              ? fmt.dayLabel(tick.iso, tz)
-              : fmt.time(tick.iso, tz),
-        leftPct: tick.leftPct.toFixed(2),
-        isNow: tick.kind === 'now',
-        edge: tick.kind,
-      })),
-    [grid, tz],
-  );
+  const ticks = useMemo(() => axisTickLabels(grid, tz), [grid, tz]);
 
   function onPointerMove(e: PointerEvent<HTMLDivElement>) {
     setCursor(indexFromPointer(e.clientX, e.currentTarget.getBoundingClientRect(), n));
@@ -83,7 +67,7 @@ export function AllRoomsPanel({ overview, range, onRangeChange }: AllRoomsPanelP
             <span
               aria-hidden="true"
               className={styles.cursorLine}
-              style={{ left: `${(((cursorIndex + 0.5) / n) * 100).toFixed(2)}%` }}
+              style={{ left: `${centerPct(cursorIndex, n).toFixed(2)}%` }}
               data-testid="tutte-cursor-line"
             />
           ) : null}

@@ -2,7 +2,8 @@
 import type { RoomTimeline } from '../../../../api/types';
 import { t, tDynamic } from '../../../../i18n';
 import { fmt } from '../../../../i18n/format';
-import { cursorPhase } from '../../logic/cursor';
+import { cursorWhen as gridCursorWhen } from '../../components/chartTexts';
+import { sampleAt } from '../../thermogram/samples';
 
 function temp(v: number | null | undefined): string {
   return v == null ? t('common.missingValue') : fmt.temp(v);
@@ -14,39 +15,27 @@ function pct(v: number | null | undefined): string {
 
 /** Room temperature at sample i (measured up to now, forecast after). */
 export function roomTemperatureAt(tl: RoomTimeline, i: number): number | null {
-  return tl.climate.measuredC[i] ?? tl.climate.forecastC[i] ?? null;
+  return sampleAt(tl.climate.measuredC, tl.climate.forecastC, i);
 }
 
 /** "ore 00:30" · "sab 14 · 00:30" · "adesso · 08:30" · "previsione · 10:00" */
 export function cursorWhen(tl: RoomTimeline, i: number): string {
-  const iso = tl.grid.t[i] ?? tl.grid.end;
-  const tz = tl.clock.timeZone;
-  const time = fmt.time(iso, tz);
-  switch (cursorPhase(i, tl.grid.nowIndex)) {
-    case 'now':
-      return t('clima.cursor.now', { time });
-    case 'forecast':
-      return t('clima.cursor.forecast', { time });
-    default:
-      return tl.grid.range === '7d'
-        ? t('clima.cursor.past7d', { day: fmt.dayLabel(iso, tz), time })
-        : t('clima.cursor.past24h', { time });
-  }
+  return gridCursorWhen(tl.grid, i, tl.clock.timeZone);
 }
 
 /** "21,3° · 49%" for the room at sample i. */
 export function roomValueAt(tl: RoomTimeline, i: number): string {
   return t('clima.cursor.value', {
     temperature: temp(roomTemperatureAt(tl, i)),
-    humidity: pct(tl.climate.measuredHumidityPct[i] ?? tl.climate.forecastHumidityPct[i]),
+    humidity: pct(sampleAt(tl.climate.measuredHumidityPct, tl.climate.forecastHumidityPct, i)),
   });
 }
 
 /** "7,1° · 81%" outdoors at sample i. */
 export function outdoorValueAt(tl: RoomTimeline, i: number): string {
   return t('clima.cursor.value', {
-    temperature: temp(tl.outdoor.measuredC[i] ?? tl.outdoor.forecastC[i]),
-    humidity: pct(tl.outdoor.measuredHumidityPct[i] ?? tl.outdoor.forecastHumidityPct[i]),
+    temperature: temp(sampleAt(tl.outdoor.measuredC, tl.outdoor.forecastC, i)),
+    humidity: pct(sampleAt(tl.outdoor.measuredHumidityPct, tl.outdoor.forecastHumidityPct, i)),
   });
 }
 

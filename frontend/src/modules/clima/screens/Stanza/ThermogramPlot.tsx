@@ -10,7 +10,7 @@ import { indexFromPointer, keyboardStep, moveCursor, tooltipOnLeft } from '../..
 import type { EditorAvailability } from '../../logic/editorOptions';
 import { actionLabel, roomName, systemName } from '../../names';
 import { outdoorChartPaths, roomChartPaths } from '../../thermogram/paths';
-import { nowPct, ROOM_TICKS, tickTopPct, yRoomT } from '../../thermogram/scales';
+import { centerPct, nowPct, ROOM_TICKS, tickTopPct, yRoomT } from '../../thermogram/scales';
 import {
   cursorValueText,
   cursorWhen,
@@ -114,7 +114,7 @@ function OutdoorChart({ tl }: { tl: RoomTimeline }) {
 
 function CursorLayer({ tl, lanes, index }: { tl: RoomTimeline; lanes: readonly SystemLaneData[]; index: number }) {
   const n = tl.grid.count;
-  const left = `${(((index + 0.5) / n) * 100).toFixed(2)}%`;
+  const left = `${centerPct(index, n).toFixed(2)}%`;
   const temperature = roomTemperatureAt(tl, index);
   const onLeft = tooltipOnLeft(index, n);
   return (

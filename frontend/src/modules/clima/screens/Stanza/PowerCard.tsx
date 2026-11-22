@@ -53,7 +53,9 @@ export function PowerCard({ tl }: { tl: RoomTimeline }) {
             <div>
               <div className={styles.mutedLabel}>{t('clima.power.now')}</div>
               <div className={`${styles.powerNow} num`}>
-                {decimal(p.nowKw, 1)} <span className={styles.powerUnit}>{t('clima.power.unitKw')}</span>
+                {/* The mockup renders the unit right after the number, with no space. */}
+                {decimal(p.nowKw, 1)}
+                <span className={styles.powerUnit}>{t('clima.power.unitKw')}</span>
               </div>
             </div>
             <div className={styles.powerRight}>

@@ -1,6 +1,7 @@
 // Rows of the accessible data table behind the thermogram.
 import type { Action, RoomTimeline } from '../../../api/types';
 import { cursorPhase, type CursorPhase } from '../logic/cursor';
+import { sampleAt } from './samples';
 
 export interface TableRow {
   index: number;
@@ -23,8 +24,8 @@ export function tableRows(tl: RoomTimeline): TableRow[] {
       index: i,
       iso: t[i]!,
       phase: cursorPhase(i, nowIndex),
-      temperatureC: tl.climate.measuredC[i] ?? tl.climate.forecastC[i] ?? null,
-      humidityPct: tl.climate.measuredHumidityPct[i] ?? tl.climate.forecastHumidityPct[i] ?? null,
+      temperatureC: sampleAt(tl.climate.measuredC, tl.climate.forecastC, i),
+      humidityPct: sampleAt(tl.climate.measuredHumidityPct, tl.climate.forecastHumidityPct, i),
       targetC: tl.target.targetC[i] ?? null,
       actions: tl.lanes.map((l) => l.action[i] ?? null),
     });

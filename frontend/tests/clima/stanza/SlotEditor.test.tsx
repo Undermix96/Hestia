@@ -195,4 +195,30 @@ describe('SlotEditor', () => {
       change: { levelValueC: 20.5, targetC: null },
     });
   });
+
+  it('changing room closes the editor and drops the draft before the new room has loaded', async () => {
+    const { router } = await renderRoom('home');
+    await openEditor(segmentButton('z-soggiorno', 'fri', 'fri-1'));
+    fireEvent.click(plus());
+    expect(useClimaStore.getState().draft).not.toBeNull();
+    await act(() => router.navigate('/clima/stanza/camera?scenario=home'));
+    // the effect runs with the navigation, while soggiorno may still be on screen
+    expect(useClimaStore.getState()).toMatchObject({ selection: null, editorOption: null, draft: null });
+    expect(editor()).toBeNull();
+    await waitFor(() => expect(useClimaStore.getState().lastRoomId).toBe('camera'));
+  });
+
+  it('leaving the screen closes the editor and clears the cursor', async () => {
+    const { view } = await renderRoom('home');
+    await openEditor(segmentButton('z-soggiorno', 'fri', 'fri-1'));
+    fireEvent.click(plus());
+    act(() => useClimaStore.getState().setCursor(40));
+    view.unmount();
+    expect(useClimaStore.getState()).toMatchObject({
+      selection: null,
+      editorOption: null,
+      draft: null,
+      cursorIndex: null,
+    });
+  });
 });

@@ -75,6 +75,22 @@ export function StanzaScreen() {
   const draft = useClimaStore((s) => s.draft);
   const setLastRoom = useClimaStore((s) => s.setLastRoom);
   const setOutdoorNow = useClimaStore((s) => s.setOutdoorNow);
+  const closeEditor = useClimaStore((s) => s.closeEditor);
+  const setCursor = useClimaStore((s) => s.setCursor);
+
+  // Another room closes the editor at once, not only once its timeline has loaded (setLastRoom).
+  useEffect(() => {
+    if (roomId !== useClimaStore.getState().lastRoomId) closeEditor();
+  }, [roomId, closeEditor]);
+
+  // Leaving the screen discards the editor and its draft, and the cursor.
+  useEffect(
+    () => () => {
+      closeEditor();
+      setCursor(null);
+    },
+    [closeEditor, setCursor],
+  );
 
   // A draft belongs to the room shown last: never preview it on another room.
   const timeline = useRoomTimeline(roomId, range, lastRoomId === roomId ? draft : null);
