@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 import { expect, it, openStanza, openTutte, SCENARIOS, test, thermogram, tuttePanel } from './fixtures';
 
-// Smoke tests of the mock scenarios (plan §5 M1: only `home` is compared with the mockups).
+// Smoke tests of the mock scenarios (spec §8.3: only `home` is compared with the mockups).
 // Every test fails on console errors (fixtures.ts).
 
 const roomTabs = (page: Page) => page.getByRole('group', { name: it['clima.rooms.label'] });

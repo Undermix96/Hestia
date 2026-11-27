@@ -1,6 +1,8 @@
 # Hestia: piano di implementazione
 
-> Stato: **M1 rilasciato come v0.2.0** (22 novembre 2026); M0 rilasciato come v0.1.0 e chiuso (21 novembre 2026); prossimo passo M2. Decisioni aperte chiuse il 20 novembre 2026. Rispetto all'handoff: niente pulsanti di modalità nella scheda «Corrente climatizzatori». Specifica di design: [`docs/design/HANDOFF.md`](design/HANDOFF.md).
+> Contiene il design del progetto: principi, modello, adattatori, note di progettazione per milestone, API, CI,
+> i18n e rischi. Lo stato dei lavori (roadmap, task, diario, domande aperte) è in Heph (progetto `hestia`);
+> le decisioni sono in [`DECISIONS.md`](../DECISIONS.md). Specifica di design: [`docs/design/HANDOFF.md`](design/HANDOFF.md).
 
 ## Contesto
 
@@ -10,25 +12,7 @@ Il progetto è **pubblico**: deve adattarsi a configurazioni di HA molto diverse
 
 ## Decisioni prese
 
-| Tema | Decisione |
-|---|---|
-| Architettura | Backend nel container: tiene il token di HA, si iscrive al WebSocket di HA ed espone l'API del contratto più gli aggiornamenti dal vivo via SSE. Il frontend non vede mai il token. |
-| Frontend | React + TypeScript + Vite. Animazioni in CSS, con la libreria Motion dove serve coordinarle. Tipi generati dall'OpenAPI del backend. |
-| Backend | Python + FastAPI. |
-| Immagini | Monorepo con **due immagini** (`hestia-backend`, `hestia-frontend`), multi-arch amd64 + arm64. |
-| Deploy | `docker-compose.yml` che usa solo le immagini pubbliche su GHCR (nessuna sezione `build:`). Le build avvengono solo nella GitHub Action. |
-| Accesso | Solo LAN, nessun login. |
-| Configurazione | Procedura di setup nella UI, con form generati dagli schemi degli adattatori. |
-| Moduli | Energia e Luci nascosti; esiste già il registro dei moduli. |
-| Lingue | Italiano e inglese. Altre lingue aggiungibili da terzi senza ricompilare. |
-| Test | Automatici in CI: pytest e Vitest, più Playwright. |
-| Ordine dei lavori | Prima la UI su dati simulati, poi il backend reale, poi la procedura di configurazione, gli override e la previsione. |
-| Licenza | MIT. |
-| Lingua | Codice, commenti e documentazione per contributor in inglese; README in inglese e italiano. |
-| Nomi delle immagini | `ghcr.io/undermix96/hestia-backend` e `hestia-frontend`. |
-| Override temporanei | Solo sulla **fascia in corso**. Le fasce future si possono modificare solo in modo permanente (se l'adattatore lo supporta). |
-| Modalità climatizzatori | **Nessun pulsante di modalità** (Caldo/Freddo/Deumidifica/Spento) nella UI: la modalità la decide il sistema domotico. Hestia la legge e la mostra. |
-| Banda target nel termogramma | Con più impianti nella stessa stanza, **i caloriferi hanno la precedenza**. |
+Le decisioni sono in [`DECISIONS.md`](../DECISIONS.md).
 
 **Casa dell'autore (adattatori v1)**
 - Caloriferi: un'entità `climate.*` per zona.
@@ -37,8 +21,7 @@ Il progetto è **pubblico**: deve adattarsi a configurazioni di HA molto diverse
 - Consumi: misuratore del totale casa più prese dedicate agli split.
 - Esterno: sensore fisico. Sono previste anche le fonti `weather.*` di HA e Open-Meteo.
 - Storico: InfluxDB 2.x alimentato da HA.
-- Override: chi modifica sceglie ogni volta tra «solo questa fascia» e «permanente». Il permanente cambia il valore del livello e/o gli orari della fascia.
-- Previsione: modello termico a un nodo con coefficienti stimati dallo storico.
+- Durata delle modifiche e modello di previsione: D30 e D31 in [`DECISIONS.md`](../DECISIONS.md).
 
 ---
 
@@ -238,90 +221,10 @@ Hestia/
 └─ .github/workflows/{tests.yml (riusabile), ci.yml, docker-build.yml}
 ```
 
-## 5. Milestone
+## 5. Note di progettazione per milestone
 
-### M0: scheletro, CI e licenza (v0.1.0) — rilasciato
-
-**Contenuto**
-- Struttura delle cartelle.
-- Backend con `/api/health` e `/api/version`; frontend minimo servito da nginx.
-- Dockerfile reali per le due immagini.
-- Workflow: test, build delle 2 immagini × 2 architetture, poi tag git e verifica (§7).
-- `docker-compose.yml`, LICENSE (MIT), CONTRIBUTING; README in inglese e italiano.
-- Regole di `import-linter` attive.
-- `.dockerignore`: esclude `docs/`, `node_modules`, `.venv` e `dist`, include `locales/`.
-
-**Verifica**
-- `docker buildx imagetools inspect` mostra manifest amd64 e arm64 per entrambe le immagini.
-- Il pull anonimo funziona per entrambi i pacchetti.
-- `compose up` risponde su `/api/health` passando da nginx. L'arm64 si verifica solo tramite build e manifest (nessuna macchina arm64 per i test).
-
-**Esito (21 novembre 2026)**
-- PR #1 unita in `main`; release `v0.1.0` pubblicata: immagini amd64 + arm64 per entrambi i pacchetti, scaricabili senza login, tag git `v0.1.0` su `84b020c`.
-- Il job `release` del workflow è fallito: GitHub rifiuta il push del tag con il `GITHUB_TOKEN` perché il commit modifica file in `.github/workflows/` (manca il permesso `workflows`, che il `GITHUB_TOKEN` non può avere). Il tag è stato creato a mano e il controllo del pull anonimo fatto a mano. Vedi R19.
-- In locale: tutti i comandi della CI, build arm64 sotto QEMU e test con `compose up` passando da nginx sono riusciti.
-- Scelte emerse durante l'implementazione:
-  - la variabile del tag immagine in compose è `HESTIA_TAG`, non `HESTIA_VERSION`: quest'ultima la imposta solo l'immagine e la legge `/api/version` (con lo stesso nome, un valore nel `.env` avrebbe sovrascritto la versione riportata);
-  - `latest` e `X.Y` vengono spostati da un job separato (`promote`) solo dopo che entrambe le build sono riuscite;
-  - nginx invia `X-Forwarded-For: $remote_addr`, così un client non può falsificare l'IP visto dal backend;
-  - `ci.yml` gira sulle PR e sui push a `main` soltanto, per non eseguire i test due volte;
-  - i pacchetti GHCR ereditano la visibilità pubblica del repository: nessun passo manuale;
-  - TypeScript resta alla 6.0 finché typescript-eslint non supporta la 7; pytest ignora un solo avviso di deprecazione di Starlette su `httpx` (passaggio a `httpx2` da valutare).
-
-**Attività chiuse dopo il rilascio**
-- [x] Token per il tag di release: secret `RELEASE_TOKEN` (fine-grained, *Contents* e *Workflows* in scrittura sul solo repo Hestia) usato dal job `release` di `docker-build.yml`; il job `version` si ferma subito se il secret manca. Il token scade: va rinnovato e il secret aggiornato.
-- [x] Vecchio pacchetto GHCR `hestia`: non è mai stato pubblicato, quindi non c'è nulla da deprecare.
-
-### M1: UI fedele ai mockup, guidata dalle capacità, su dati simulati (v0.2.0) — rilasciato
-
-**Contenuto**
-- Contratto generico (§1) in Pydantic, con i tipi TS generati.
-- `MockDataSource`, port di `Neng.js`, con orologio fisso al 20/11/2026 08:30.
-- **Scenari mock** selezionabili con `?scenario=`:
-
-  | Scenario | Cosa simula |
-  |---|---|
-  | `home` | la casa dell'handoff |
-  | `perSlot` | un target per ogni fascia |
-  | `readonly` | programmi in sola lettura |
-  | `noProgram` | nessun programma |
-  | `manyRooms` | 10 stanze, 3 impianti in una stanza, deumidificatore come `kind` sconosciuto |
-
-- Token CSS, font in self-hosting, Header con registro dei moduli.
-- Le due schermate.
-- Corsie generate dai System; `ProgramBar` per ogni rappresentazione del programma.
-- `SlotEditor` limitato agli scope supportati.
-- Animazioni: CSS e Motion; rispetta `prefers-reduced-motion`.
-- Accessibilità di base: `role="img"` con `aria-label`, tabella nascosta, navigazione da tastiera.
-- i18n ICU, con solo l'italiano ma l'infrastruttura completa.
-
-**Verifica**
-- Vitest su: costruzione dei path, `runs`, colori, `summaryFacts` (casi di HANDOFF §7 più varianti generiche), matrice capacità → editor.
-- Playwright a 1400 px con orologio fisso sullo scenario `home`:
-  - Stanza: 24 ore, 7 giorni, cursore;
-  - Tutte le stanze: 24 ore e 7 giorni;
-  - confronto manuale con `docs/design/screenshots`, poi baseline con tolleranza;
-  - controllo axe.
-- Gli altri scenari solo come smoke test.
-
-**Esito (22 novembre 2026)**
-- Consegnato tutto il contenuto: contratto Pydantic (`core/` + `api/clima_models.py`) con `schema.d.ts` generato (`npm run gen:api`, CI con `check:api`); `MockDataSource` con i 5 scenari; token, font in self-hosting, header dal registro dei moduli; le schermate Stanza e Tutte le stanze con corsie, `ProgramBar` per ogni rappresentazione (`levels`, `perSlot`, `onOff`, `none`), `SlotEditor`, cursore da mouse e tastiera, tabelle nascoste e animazioni.
-- Verifica: Vitest (737 test, tra cui la parità con gli script dei mockup e il controllo del catalogo), Playwright (smoke di tutti gli scenari, Stanza e Tutte su `home`, axe su ogni stanza di `home` in 24 ore e 7 giorni, 5 screenshot di riferimento), backend con ruff, mypy strict, import-linter e pytest.
-- Scelte emerse durante l'implementazione:
-  - le rotte del contratto (`GET /api/rooms`, `/api/clima/rooms/{id}/timeline`, `/api/clima/overview`, `POST /api/overrides`, `DELETE /api/overrides/{id}`) esistono con i modelli definitivi ma rispondono **503** `{"code": "no_data_source"}` fino a M2; con `?source=http` la UI mostra la schermata d'errore;
-  - nell'OpenAPI ogni proprietà è `required` (i campi nulli viaggiano come `null`, mai omessi), così i tipi TS non hanno campi facoltativi;
-  - `locales/it.json` alla radice è l'unico catalogo (anche i nomi delle stanze e degli impianti simulati, `mock.*`); un test controlla chiavi mancanti e inutilizzate; `en.json` resta solo `meta`;
-  - il mock riproduce **bit per bit** la simulazione di `Neng.js` (i test eseguono gli script dei mockup come oracolo), comprese le due simulazioni separate per 24 ore e 7 giorni (Soggiorno 21,8° contro 21,5°);
-  - in `home` tutti i giorni usano il programma feriale, quindi il fine settimana inizia alle 06:00 e non alle 07:30 del mockup; la variante 07:30 è nello scenario `perSlot`;
-  - header con «Hestia», senza Energia, Luci e «+ modulo»; orologio fisso alle 08:30 (i mockup mostrano 08:37); modalità dei climatizzatori come testo, senza pulsanti;
-  - l'editor delle fasce ha un selettore dello scope («solo questa fascia», «permanente: valore», «permanente: orari»), limitato a quanto permettono le capacità; le fasce passate non sono cliccabili;
-  - una modifica vale da adesso in poi: divide la fascia in corso all'istante attuale; la fine giornata si scrive «24:00» (non «00:00»);
-  - con `prefers-reduced-motion` si fermano le animazioni e sparisce l'anello pulsante dei pallini di stato; il passaggio tra 24 ore e 7 giorni non anima le linee (i path hanno un numero diverso di punti, come nel mockup);
-  - accessibilità (axe): le etichette sulle fasce più calde (da circa 22,5°) passano dal bianco al nero, perché il bianco sul colore dei 23° ha contrasto 4,1:1; in Tutte le stanze il testo «standby/spento» usa il grigio del testo, non quello del pallino;
-  - layout tablet (768–1279 px): consumi e programma uno sotto l'altro, colonne laterali di Tutte le stanze più strette e, su grafici stretti, un'etichetta di giorno sì e una no;
-  - i mini grafici di Tutte le stanze tagliano la scala a 15–24° come il mockup: un valore fuori scala resta sul bordo;
-  - le schermate sono caricate in modo lazy (un chunk per schermata);
-  - gli screenshot di riferimento sono render **Linux** generati nell'immagine Docker di Playwright (stessa versione di `@playwright/test`); su Windows e macOS i test `@visual` vengono saltati; in CI Playwright gira in un job `e2e` dentro la stessa immagine.
+Roadmap, stato, criteri di verifica ed esiti sono in Heph (progetto `hestia`); qui restano solo le note di
+progettazione delle milestone da M2 in poi.
 
 ### M2: core, framework degli adattatori e adattatori v1 in sola lettura (v0.3.0)
 
@@ -338,12 +241,6 @@ Hestia/
 - Configurazione in SQLite con migrazioni. Primo caricamento da `/data/config.yaml`, validato con gli schemi degli adattatori; la procedura di setup arriva in M3.
 - `SystemRuntime` e `StateStore`; SSE con debounce di 1–2 s e heartbeat ogni 15 s.
 - `TimelineBuilder` per gli aggregati delle due schermate.
-
-**Verifica**
-- Test di contratto di ogni adattatore v1 su `FakeHomeAssistant`.
-- Core: giorni del cambio d'ora a marzo e ottobre 2026 (46 e 50 campioni); buchi a `null`.
-- `influx2` contro un `influxdb:2` reale in CI.
-- Nella casa reale: schede uguali ad HA; SSE con latenza sotto i 3 s attraverso nginx.
 
 ### M3: procedura di setup generata dagli schemi, inglese e lingue aggiuntive (v0.4.0)
 
@@ -368,13 +265,6 @@ Hestia/
 - Inglese completo.
 - Lingue aggiuntive senza ricompilare, compresi i frammenti di traduzione dei plugin.
 
-**Verifica**
-- I JSON Schema sono validi.
-- I segreti non compaiono mai nelle risposte.
-- La migrazione della configurazione di un adattatore da v1 a v2 funziona.
-- `schemaForm` gestisce tutti i costrutti usati: enum, oneOf, array, campi dipendenti, campi avanzati.
-- Playwright con HA finto, negli scenari `home` e «minimo» (solo climate più recorder).
-
 ### M4: override, scritture e modalità (v0.5.0)
 
 **OverrideManager nel core**
@@ -398,14 +288,6 @@ Hestia/
 - L'editor mostra un'anteprima della differenza prima di confermare.
 - Fascia in corso: «solo questa fascia» e le opzioni permanenti supportate. Fascia futura: solo le opzioni permanenti. Fascia conclusa: non cliccabile.
 
-**Verifica**
-- Contratti di scrittura e rilettura: gli altri blocchi restano intatti.
-- Un override temporaneo su una fascia futura viene rifiutato (422).
-- Riapplicazione dopo il riavvio di HA.
-- Limiti ±4° e passo 0,5.
-- Un helper YAML restituisce 409 e la UI nasconde le opzioni.
-- Prova manuale su una zona reale, con la checklist nel README.
-
 ### M5: previsione e fonti meteo (v0.6.0)
 
 **Modello termico generico**
@@ -424,12 +306,6 @@ Hestia/
 - `ha_weather`, `open_meteo`, `composite`.
 - Se lo storico non ha le azioni (`actionHistory` falso), si ricostruiscono con l'isteresi e la qualità della previsione viene segnalata come ridotta.
 
-**Verifica**
-- Su dati sintetici il fit ritrova i coefficienti entro ±10%.
-- Con pochi dati scatta il ripiego sui coefficienti del mockup.
-- `OutdoorSourceContract` con risposte registrate.
-- Backtest dell'errore medio assoluto a 2 ore, esposto in `/api/forecast/metrics`.
-
 ### M6: seconda ondata di adattatori ed ecosistema (v0.7.0)
 
 **Adattatori**
@@ -447,10 +323,6 @@ Hestia/
 - Documentazione completa per contributor.
 - Plugin d'esempio.
 
-**Verifica**
-- Tutti i contratti passano.
-- Un plugin esterno installato in un'immagine derivata durante la CI compare in `/api/adapters` e supera i propri contratti.
-
 ### M7: verso la 1.0 (v1.0.0)
 
 **Contenuto**
@@ -460,11 +332,6 @@ Hestia/
 - Layout tablet.
 - Avviso se le versioni di frontend e backend non coincidono.
 - Documentazione utente bilingue.
-
-**Verifica**
-- Checklist dell'handoff completa.
-- Test end-to-end negli scenari `home` e «minimo».
-- Una settimana di uso reale.
 
 ## 6. API (tutte sotto `/api`)
 

@@ -20,8 +20,8 @@ adatta a ciò che ogni adattatore supporta. Vedi
 uscito come `v0.1.0`). Le schermate «Stanza» e «Tutte le stanze» del modulo Clima
 sono pronte, ma funzionano su **dati simulati** (orologio fisso e alcune case di
 prova, scelte con `?scenario=`): Hestia non legge ancora Home Assistant, quindi non
-c'è ancora nulla di utile da installare. I dati reali arrivano con M2. La tabella
-di marcia è in [docs/implementation-plan.md](docs/implementation-plan.md) §5.
+c'è ancora nulla di utile da installare. I dati reali arrivano con M2; le note di
+progettazione per milestone sono in [docs/implementation-plan.md](docs/implementation-plan.md) §5.
 
 ## Avvio rapido
 
@@ -108,7 +108,7 @@ Il repository è un monorepo:
 | [`frontend/`](frontend/README.md) | React + TypeScript + Vite, gestito con npm |
 | [`contract/openapi.json`](contract/openapi.json) | Contratto dell'API generato dal backend |
 | [`locales/`](locales/README.md) | Traduzioni |
-| [`docs/`](docs/) | Architettura, design e piano di implementazione |
+| [`docs/`](docs/) | Architettura, design, specifiche e piano di implementazione |
 
 I comandi per installare, avviare, controllare e testare ogni parte sono in
 [backend/README.md](backend/README.md) e [frontend/README.md](frontend/README.md);
@@ -118,7 +118,9 @@ commenti e documentazione per contributor sono in inglese.
 ## Documentazione
 
 - [docs/architecture.md](docs/architecture.md): panoramica dell'architettura (core, ports, adattatori), in inglese.
-- [docs/implementation-plan.md](docs/implementation-plan.md): piano di implementazione e milestone.
+- [docs/implementation-plan.md](docs/implementation-plan.md): design del progetto e note per milestone.
+- [DECISIONS.md](DECISIONS.md): decisioni durevoli (in inglese).
+- [docs/specs/m1-ui.md](docs/specs/m1-ui.md): specifica storica di M1 (in inglese).
 - [docs/design/](docs/design/README.md): specifica di design della dashboard Clima;
   parti da [HANDOFF.md](docs/design/HANDOFF.md).
 

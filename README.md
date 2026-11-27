@@ -19,8 +19,8 @@ adapter supports. See [docs/architecture.md](docs/architecture.md).
 released as `v0.1.0`). The Climate module's "Room" and "All rooms" screens are
 finished, but they run on **simulated data** (a fixed clock and a few mock
 houses, selectable with `?scenario=`): Hestia does not read Home Assistant yet,
-so there is still nothing useful to install. Real data arrives in M2. The
-roadmap is in [docs/implementation-plan.md](docs/implementation-plan.md) §5.
+so there is still nothing useful to install. Real data arrives in M2; design
+notes per milestone are in [docs/implementation-plan.md](docs/implementation-plan.md) §5.
 
 ## Quick start
 
@@ -104,7 +104,7 @@ This is a monorepo:
 | [`frontend/`](frontend/README.md) | React + TypeScript + Vite, managed with npm |
 | [`contract/openapi.json`](contract/openapi.json) | API contract generated from the backend |
 | [`locales/`](locales/README.md) | Translations |
-| [`docs/`](docs/) | Architecture, design and implementation plan |
+| [`docs/`](docs/) | Architecture, design, specs and implementation plan |
 
 See [backend/README.md](backend/README.md) and [frontend/README.md](frontend/README.md)
 for the commands to install, run, lint and test each part, and
@@ -113,7 +113,9 @@ for the commands to install, run, lint and test each part, and
 ## Documentation
 
 - [docs/architecture.md](docs/architecture.md): architecture overview (core, ports, adapters).
-- [docs/implementation-plan.md](docs/implementation-plan.md): implementation plan and milestones (in Italian).
+- [docs/implementation-plan.md](docs/implementation-plan.md): project design and notes per milestone (in Italian).
+- [DECISIONS.md](DECISIONS.md): durable decisions.
+- [docs/specs/m1-ui.md](docs/specs/m1-ui.md): historical implementation spec of M1.
 - [docs/design/](docs/design/README.md): design specification of the Climate
   dashboard; start from [HANDOFF.md](docs/design/HANDOFF.md).
 
