@@ -18,7 +18,7 @@ Why: Pydantic is allowed in the pure core because it does no I/O.
 Alternatives rejected: not recorded.
 
 ## D3 — Real contract routes that answer 503 (2026-11-21)
-Decision: the M1 routes (`GET /api/rooms`, `GET /api/clima/rooms/{room_id}/timeline`, `GET /api/clima/overview`, `POST /api/overrides`, `DELETE /api/overrides/{override_id}`) are registered with their final models; until a data source exists they answer 503 `{"code": "no_data_source", "message": ...}`.
+Decision: register the real M1 routes (`GET /api/rooms`, `GET /api/clima/rooms/{room_id}/timeline`, `GET /api/clima/overview`, `POST /api/overrides`, `DELETE /api/overrides/{override_id}`) with their final response and request models, so the models enter `contract/openapi.json`; in M1 their handlers always raise `DataSourceUnavailableError`, answered as 503 `{"code":"no_data_source","message":...}`.
 Why: the routes and schemas are the M2 contract, FastAPI exports them naturally, and nothing pretends to serve data.
 Alternatives rejected: an "extra components" hack to put the models into the OpenAPI document.
 
@@ -27,8 +27,8 @@ Decision: TS types are generated with `openapi-typescript` 7.13.0 into `frontend
 Why: not recorded.
 Alternatives rejected: not recorded.
 
-## D5 — No clock time derived from sample indices (2026-11-21)
-Decision: every grid sample has its ISO timestamp with offset in `grid.t[i]`; segment and run boundaries carry indices and timestamps; hours and day labels come from `Intl.DateTimeFormat` with `clock.timeZone`.
+## D5 — The frontend never derives clock time from a sample index (2026-11-21)
+Decision: the frontend never derives clock time from a sample index. Every grid sample has its ISO timestamp in `grid.t[i]` (with offset). Segment and run boundaries carry indices and timestamps. Hours, day labels and "HH:MM" come from `Intl.DateTimeFormat` on those timestamps with `clock.timeZone`.
 Why: not recorded.
 Alternatives rejected: deriving the time from the sample index, as the mockup's `hAt()` does.
 
@@ -38,9 +38,9 @@ Why: `?source=http` is a development aid for M2 and shows the 503 error state.
 Alternatives rejected: not recorded.
 
 ## D7 — Program representation of the `home` scenario (2026-11-21)
-Decision: radiators and splits use `representation: 'levels'`, like `ha_schedule_levels`, with one level per distinct target value of the mockup (soggiorno 2 levels, camera 4, cameretta 4, bagno 3; each split 1 level, its set point), and the same weekday program on all 7 days. The weekend variant starting at 07:30 lives in the `perSlot` scenario.
-Why: it reproduces the screenshots exactly; a weekend program would change the 7-day values (checked: the bagno temperature now becomes 20.4 instead of 20.1). Accepted deviation: in `home` Saturday and Sunday start at 06:00, and the handoff says the weekend must be read from the real program.
-Alternatives rejected: a weekend-specific program in `home` (changes the 7-day values).
+Decision: radiators and splits use `representation: 'levels'` (like `ha_schedule_levels`), with one level per distinct target value of the mockup (soggiorno 2 levels, camera 4, cameretta 4, bagno 3; each split 1 level, its set point). The same weekday program is used on all 7 days in `home`. The `perSlot` scenario carries the 07:30 weekend variant so day-specific programs are exercised.
+Why: the levels reproduce the screenshots exactly; the mockup simulation uses the weekday program, and a weekend-specific program changes the 7-day values (checked: the bagno temperature now becomes 20.4 instead of 20.1). Accepted deviation: in `home` the "Programma della settimana" shows Saturday and Sunday starting at 06:00 instead of the mockup's hypothetical 07:30; the handoff itself says the weekend must be read from the real program.
+Alternatives rejected: a weekend-specific program in `home`.
 
 ## D8 — Per-range simulation quirk preserved (2026-11-21)
 Decision: like the mockup, the 24h and 7d views run separate simulations (different warm-up start and outdoor noise alignment), so the temperature "now" differs between them (Soggiorno 21.8 in 24h, 21.5 in 7d).
@@ -58,7 +58,7 @@ Why: on a future slot Hestia would race the user's automation (plan R4).
 Alternatives rejected: temporary overrides on future slots.
 
 ## D11 — One i18n catalog (2026-11-21)
-Decision: `locales/it.json` at the repository root (flat ICU messages plus `meta`) is the single source; the frontend imports it at build time and tests import the same file. `en.json` stays `meta`-only in M1. `frontend/src/i18n/it.json` is deleted. The names of mock rooms and systems are catalog keys too (`mock.*`), and a test checks for missing and unused keys.
+Decision: `locales/it.json` at the repository root (flat ICU messages plus `meta`) is the single source; the frontend imports it at build time (relative import from `src/i18n/index.ts`) and tests import the same file. `en.json` stays `meta`-only in M1. `frontend/src/i18n/it.json` is deleted. The names of mock rooms and systems are catalog keys too (`mock.*`), and a test checks for missing and unused keys.
 Why: not recorded.
 Alternatives rejected: a second catalog in `frontend/src/i18n/`.
 
