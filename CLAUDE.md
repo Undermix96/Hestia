@@ -1,6 +1,6 @@
 # Hestia
 
-Work state: legacy (docs/implementation-plan.md), not tracked in Heph — chosen 2026-11-27.
+
 
 ## Sources of truth
 
