@@ -2174,7 +2174,7 @@ files owned by others instead of fixing them.
 - Own: `frontend/playwright.config.ts`, `frontend/e2e/**` (extends B's smoke), `frontend/e2e/__screenshots__/**`,
   `frontend/tests/clima/catalog.test.ts`; edits the e2e section of `frontend/README.md`.
 
-**Closing (orchestrator, not a task)**: `docs/implementation-plan.md` M1 status/outcome, version bump if any, final
+**Closing (orchestrator, not a task)**: `docs/implementation-plan.md` M1 status/outcome (since moved to Heph), version bump if any, final
 full CI run.
 
 ### 9.3 Shared-file protocol

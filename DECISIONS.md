@@ -38,17 +38,17 @@ Why: `?source=http` is a development aid for M2 and shows the 503 error state.
 Alternatives rejected: not recorded.
 
 ## D7 — Program representation of the `home` scenario (2026-11-21)
-Decision: radiators and splits use `representation: 'levels'`, one level per distinct target of the mockup, and the same weekday program on all 7 days. The weekend variant starting at 07:30 lives in the `perSlot` scenario.
-Why: it reproduces the screenshots exactly; a weekend program would change the 7-day values. Accepted deviation: in `home` Saturday and Sunday start at 06:00, and the handoff says the weekend must be read from the real program.
+Decision: radiators and splits use `representation: 'levels'`, like `ha_schedule_levels`, with one level per distinct target value of the mockup (soggiorno 2 levels, camera 4, cameretta 4, bagno 3; each split 1 level, its set point), and the same weekday program on all 7 days. The weekend variant starting at 07:30 lives in the `perSlot` scenario.
+Why: it reproduces the screenshots exactly; a weekend program would change the 7-day values (checked: the bagno temperature now becomes 20.4 instead of 20.1). Accepted deviation: in `home` Saturday and Sunday start at 06:00, and the handoff says the weekend must be read from the real program.
 Alternatives rejected: a weekend-specific program in `home` (changes the 7-day values).
 
 ## D8 — Per-range simulation quirk preserved (2026-11-21)
-Decision: like the mockup, the 24h and 7d views run separate simulations, so the temperature "now" differs between them (Soggiorno 21.8 in 24h, 21.5 in 7d).
+Decision: like the mockup, the 24h and 7d views run separate simulations (different warm-up start and outdoor noise alignment), so the temperature "now" differs between them (Soggiorno 21.8 in 24h, 21.5 in 7d).
 Why: this is what the screenshots show.
 Alternatives rejected: not recorded.
 
 ## D9 — No mode buttons (2026-11-20)
-Decision: no Heat/Cool/Dry/Off buttons in the UI. The home automation system decides the mode; Hestia reads it and shows it as read-only text. This overrides the design handoff.
+Decision: no Heat/Cool/Dry/Off buttons in the UI. The home automation system decides the mode; Hestia reads it; the PowerCard shows the mode of mode-based systems as read-only text. This overrides the design handoff.
 Why: the mode is decided by the home automation system.
 Alternatives rejected: mode buttons as in the handoff.
 
@@ -58,17 +58,17 @@ Why: on a future slot Hestia would race the user's automation (plan R4).
 Alternatives rejected: temporary overrides on future slots.
 
 ## D11 — One i18n catalog (2026-11-21)
-Decision: `locales/it.json` at the repository root (flat ICU messages plus `meta`) is the single source; the frontend imports it at build time and tests import the same file. `en.json` stays `meta`-only until M3.
+Decision: `locales/it.json` at the repository root (flat ICU messages plus `meta`) is the single source; the frontend imports it at build time and tests import the same file. `en.json` stays `meta`-only in M1. `frontend/src/i18n/it.json` is deleted. The names of mock rooms and systems are catalog keys too (`mock.*`), and a test checks for missing and unused keys.
 Why: not recorded.
 Alternatives rejected: a second catalog in `frontend/src/i18n/`.
 
 ## D12 — Linux screenshot baselines (2026-11-21)
-Decision: Playwright visual tests run at 1400 px, Europe/Rome, it-IT, fixed clock, reduced motion and animations disabled. Baselines are generated on Linux in the Playwright Docker image; visual tests are skipped on other hosts. In CI, Playwright runs in an `e2e` job inside the same image.
+Decision: Playwright visual tests run at 1400 px, Europe/Rome, it-IT, fixed clock, reduced motion and animations disabled. Baselines are generated on Linux in the Playwright Docker image (same version as `@playwright/test`); visual tests are skipped on other hosts. In CI, Playwright runs in an `e2e` job inside the same image.
 Why: not recorded.
 Alternatives rejected: not recorded.
 
 ## D13 — M1 header and hidden modules (2026-11-21)
-Decision: the header shows "Hestia"; Energia and Luci are registered but hidden; "+ modulo" is not shown in M1.
+Decision: the header shows "Hestia" (not "casa"); Energia and Luci are registered but hidden; "+ modulo" is not shown in M1.
 Why: not recorded.
 Alternatives rejected: not recorded.
 
